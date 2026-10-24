@@ -1,0 +1,231 @@
+// string.axc - String utilities module
+// Usage: IMPORT "axm/modules/string.axc"
+
+VAR __VERSION__ = "1.1"
+VAR __AUTHOR__ = "AXIOM TEAM"
+
+// Uppercase (FULL ASCII VERSION)
+FUN Upper(s)
+  VAR result = ""
+  FOR i IN LEN(s)
+    VAR c = s[i]
+    IF c == "a"
+      result = result + "A"
+    ELIF c == "b"
+      result = result + "B"
+    ELIF c == "c"
+      result = result + "C"
+    ELIF c == "d"
+      result = result + "D"
+    ELIF c == "e"
+      result = result + "E"
+    ELIF c == "f"
+      result = result + "F"
+    ELIF c == "g"
+      result = result + "G"
+    ELIF c == "h"
+      result = result + "H"
+    ELIF c == "i"
+      result = result + "I"
+    ELIF c == "j"
+      result = result + "J"
+    ELIF c == "k"
+      result = result + "K"
+    ELIF c == "l"
+      result = result + "L"
+    ELIF c == "m"
+      result = result + "M"
+    ELIF c == "n"
+      result = result + "N"
+    ELIF c == "o"
+      result = result + "O"
+    ELIF c == "p"
+      result = result + "P"
+    ELIF c == "q"
+      result = result + "Q"
+    ELIF c == "r"
+      result = result + "R"
+    ELIF c == "s"
+      result = result + "S"
+    ELIF c == "t"
+      result = result + "T"
+    ELIF c == "u"
+      result = result + "U"
+    ELIF c == "v"
+      result = result + "V"
+    ELIF c == "w"
+      result = result + "W"
+    ELIF c == "x"
+      result = result + "X"
+    ELIF c == "y"
+      result = result + "Y"
+    ELIF c == "z"
+      result = result + "Z"
+    ELSE
+      result = result + c
+  RETURN result
+
+// Lowercase (FULL ASCII VERSION)
+FUN Lower(s)
+  VAR result = ""
+  FOR i IN LEN(s)
+    VAR c = s[i]
+    IF c == "A"
+      result = result + "a"
+    ELIF c == "B"
+      result = result + "b"
+    ELIF c == "C"
+      result = result + "c"
+    ELIF c == "D"
+      result = result + "d"
+    ELIF c == "E"
+      result = result + "e"
+    ELIF c == "F"
+      result = result + "f"
+    ELIF c == "G"
+      result = result + "g"
+    ELIF c == "H"
+      result = result + "h"
+    ELIF c == "I"
+      result = result + "i"
+    ELIF c == "J"
+      result = result + "j"
+    ELIF c == "K"
+      result = result + "k"
+    ELIF c == "L"
+      result = result + "l"
+    ELIF c == "M"
+      result = result + "m"
+    ELIF c == "N"
+      result = result + "n"
+    ELIF c == "O"
+      result = result + "o"
+    ELIF c == "P"
+      result = result + "p"
+    ELIF c == "Q"
+      result = result + "q"
+    ELIF c == "R"
+      result = result + "r"
+    ELIF c == "S"
+      result = result + "s"
+    ELIF c == "T"
+      result = result + "t"
+    ELIF c == "U"
+      result = result + "u"
+    ELIF c == "V"
+      result = result + "v"
+    ELIF c == "W"
+      result = result + "w"
+    ELIF c == "X"
+      result = result + "x"
+    ELIF c == "Y"
+      result = result + "y"
+    ELIF c == "Z"
+      result = result + "z"
+    ELSE
+      result = result + c
+  RETURN result
+
+// Join list with separator
+FUN Join(lst, sep)
+  VAR result = ""
+  FOR i IN LEN(lst)
+    IF i > 0
+      result = result + sep
+    result = result + lst[i]
+  RETURN result
+
+// Repeat string n times
+FUN Repeat(s, n)
+  VAR result = ""
+  FOR i IN n
+    result = result + s
+  RETURN result
+
+// Check if string starts with prefix
+FUN StartsWith(s, prefix)
+  IF LEN(prefix) > LEN(s)
+    RETURN FALSE
+  VAR sub = ""
+  FOR i IN LEN(prefix)
+    sub = sub + s[i]
+  RETURN sub == prefix
+
+// Check if string ends with suffix
+FUN EndsWith(s, suffix)
+  IF LEN(suffix) > LEN(s)
+    RETURN FALSE
+  VAR start = LEN(s) - LEN(suffix)
+  VAR sub = ""
+  FOR i IN LEN(suffix)
+    sub = sub + s[start + i]
+  RETURN sub == suffix
+
+// Trim leading/trailing spaces
+FUN Trim(s)
+  VAR start = 0
+  VAR end = LEN(s)
+  WHILE start < end AND s[start] == " " DO
+    start = start + 1
+  WHILE end > start AND s[end - 1] == " " DO
+    end = end - 1
+  VAR result = ""
+  FOR i IN end - start
+    result = result + s[start + i]
+  RETURN result
+
+// Reverse string
+FUN Reverse(s)
+  VAR result = ""
+  VAR i = LEN(s) - 1
+  WHILE i >= 0 DO
+    result = result + s[i]
+    i = i - 1
+  RETURN result
+
+// Replace all occurrences
+FUN Replace(s, old, new)
+  VAR result = ""
+  VAR i = 0
+  WHILE i < LEN(s) DO
+    VAR found = FALSE
+    IF i + LEN(old) <= LEN(s)
+      VAR sub = ""
+      FOR j IN LEN(old)
+        sub = sub + s[i + j]
+      IF sub == old
+        result = result + new
+        i = i + LEN(old)
+        found = TRUE
+    IF NOT found
+      result = result + s[i]
+      i = i + 1
+  RETURN result
+
+// Character at index
+FUN CharAt(s, idx)
+  IF idx < 0 OR idx >= LEN(s)
+    RETURN ""
+  RETURN s[idx]
+
+// Index of substring (-1 if not found)
+FUN IndexOf(s, sub)
+  VAR i = 0
+  WHILE i + LEN(sub) <= LEN(s) DO
+    VAR match = TRUE
+    FOR j IN LEN(sub)
+      IF s[i + j] != sub[j]
+        match = FALSE
+        BREAK
+    IF match
+      RETURN i
+    i = i + 1
+  RETURN -1
+
+// Substring (start, length)
+FUN Substring(s, start, length)
+  VAR result = ""
+  FOR i IN length
+    IF start + i < LEN(s)
+      result = result + s[start + i]
+  RETURN result

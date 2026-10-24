@@ -130,6 +130,14 @@ class FunctionCall(Node):
     def __repr__(self):
         return f"FunctionCall({self.name}({self.args}))"
 
+class MethodCall(Node):
+    def __init__(self, obj, method, args):
+        self.obj = obj # Expr
+        self.method = method 
+        self.args = args 
+    def __repr__(self):
+        return f"MethodCall({self.obj}.{self.method}({self.args}))"
+
 class Return(Node):
     def __init__(self, value):
         self.value = value    # Expr or None
@@ -139,6 +147,12 @@ class Return(Node):
 class Break(Node):
     def __repr__(self):
         return "Break"
+
+class Import(Node):
+    def __init__(self, path):
+        self.path = path  # string 
+    def __repr__(self):
+        return f'Import("{self.path}")'
 
 # ========== Expressions ==========
 class Expr(Node):
@@ -192,6 +206,12 @@ class EntityRef(Expr):
         self.name = name 
     def __repr__(self):
         return f"EntityRef(@{self.name})"
+
+class Null(Expr):
+    def __init__(self):
+        pass 
+    def __repr__(self):
+        return "Null()"
 
 class Attribute(Expr):
     def __init__(self, obj, attr):

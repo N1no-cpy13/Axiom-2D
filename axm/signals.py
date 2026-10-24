@@ -1,6 +1,6 @@
 # axm/signals.py
 
-class Signal(Exception):
+class Signal():
     pass
 
 class ReturnSignal(Signal):

@@ -3,6 +3,7 @@ from .builtins import Builtins
 import time
 from .ast import *
 from .signals import Signal, ReturnSignal, BreakSignal
+from .module_loader import ModuleLoader
 
 class AXMRuntimeError(Exception):
     pass
@@ -18,9 +19,8 @@ class Runtime:
         self.program = []
         
         self.scope_stack = []
-        
-        self.sleep_until = 0.0
-        
+        self.module_loader = ModuleLoader(self)
+                
         self.builtins = Builtins(self)
 
     # Basic tools
@@ -33,6 +33,8 @@ class Runtime:
     def axm_format_bool(self, value):
         if isinstance(value, bool):
             return "TRUE" if value else "FALSE"
+        if value is None:
+            return "NULL"
         return str(value)
     
     def is_truthy(self, value):
@@ -171,6 +173,8 @@ class Runtime:
             return expr.value 
         elif isinstance(expr, Boolean):
             return expr.value 
+        elif isinstance(expr, Null):
+            return None
         elif isinstance(expr, Variable):
             return self.lookup(expr.name)
         
@@ -181,7 +185,16 @@ class Runtime:
             obj = self.eval(expr.obj)
             attr_name = expr.attr
             
+            # Module handling
+            from .module_loader import Module, BoundModuleFunction 
+            if isinstance(obj, Module):
+                if attr_name in obj.globals:
+                    return obj.globals[attr_name]
+                if attr_name in obj.functions:
+                    return BoundModuleFunction(obj, attr_name, self)
+                raise AXMRuntimeError(f"Module '{obj.name}' has no attribute '{attr_name}'")
             
+            # Entity handling 
             from engine.Entity import Entity 
             if not isinstance(obj, Entity):
                 obj_name = getattr(expr.obj, 'name', '?')
@@ -251,6 +264,26 @@ class Runtime:
         elif isinstance(expr, FunctionCall):
             return self.execute_node(expr)
             
+        elif isinstance(expr, MethodCall):
+            obj = self.eval(expr.obj)
+            
+            # Module bound function
+            from .module_loader import BoundModuleFunction
+            if isinstance(obj, BoundModuleFunction):
+                args = [self.eval(arg) for arg in expr.args]
+                return obj.call(args)
+            
+            method_name = expr.method 
+            args = [self.eval(arg) for arg in expr.args]
+            
+            if not hasattr(obj, method_name):
+                raise AXMRuntimeError(f"'{type(obj).__name__}' has no method '{method_name}'")
+            
+            method = getattr(obj, method_name)
+            if not callable(method):
+                raise AXMRuntimeError(f"'{method_name}' is not callable")
+            
+            return method(*args)
             
         elif isinstance(expr, ListLiteral):
             return [self.eval(e) for e in expr.elements]
@@ -301,14 +334,11 @@ class Runtime:
     def tick(self):
         if not self.running:
             return
-
-        if time.time() < self.sleep_until:
-            return 
         
         while self.running and self.pc < len(self.program):
             node = self.program[self.pc]
             
-            is_yield = isinstance(node, (Sleep, Move, Damage, Heal))
+            is_yield = isinstance(node, (Move, Damage, Heal))
             
             result = self.execute_node(node)
             
@@ -371,14 +401,13 @@ class Runtime:
                 raise AXMRuntimeError(f"Invalid time unit: {unit}")
             
             if seconds > 0:
-                self.sleep_until = time.time() + seconds 
+                time.sleep(seconds)
                 
         # DAMAGE
         elif isinstance(node, Damage):
             entity = self.eval(node.entity)
             amount = self.eval(node.amount)
             self.builtins.DAMAGE(entity, amount)
-            return YieldSignal()
         
         # HEAL 
         elif isinstance(node, Heal):
@@ -533,6 +562,10 @@ class Runtime:
                 self.pop_scope()
             
             return None 
+        
+        # MethodCall
+        elif isinstance(node, MethodCall):
+            return self.eval(node)
                     
         elif isinstance(node, Return):
             value = self.eval(node.value) if node.value else None 
@@ -577,8 +610,11 @@ class Runtime:
                         return result
                 finally:
                     self.pop_scope()
-                
-           
+        
+        elif isinstance(node, Import):
+            module = self.module_loader.load(node.path)
+            module_name = node.path.replace(".axc", "").split("/")[-1].split("\\")[-1]
+            self.globals[module_name] = module 
         
         elif isinstance(node, While):
             MAX_ITERATIONS = getattr(self, 'max_while_iterations', 10000)

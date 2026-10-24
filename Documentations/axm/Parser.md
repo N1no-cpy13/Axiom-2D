@@ -8,6 +8,7 @@ Converts tokens into an Abstract Syntax Tree (AST).
 
 Supports:
 - **Variables:** `VAR x = 5`, assignment `x = 5`, index assign `list[0] = 5`
+- **Compound assignment:** `x += 1`, `x -= 1`, `x *= 2`, `x /= 2`
 - **Conditionals:** `IF cond`, `ELIF cond`, `ELSE` (indent-based, no braces)
 - **Loops:** `FOR i IN 5`, `WHILE cond DO` (indent-based)
 - **Functions:** `FUN name(params)`, `RETURN`, default params `b = 0`, type annotation `a: INT`
@@ -16,8 +17,10 @@ Supports:
 - **Lists:** `[1, 2, 3]`, indexing `list[0]`
 - **Attribute chain:** `a.b.c` (nested attribute access)
 - **Entity ref:** `@player.x` (entity attribute)
+- **Method call:** `@player.damage(10)`, `obj.method(args)`
 - **Unary minus/plus:** `-5`, `3 + -2`
 - **Type keywords as function:** `INT("42")`, `STR(42)`, `BOOL(1)`, `LIST(1,2,3)`, `NUM("3.14")`
+- **Import:** `IMPORT "path/to/module.axc"`
 
 ## Operator Precedence
 
@@ -33,8 +36,11 @@ Supports:
 
 - **`@entity.action`**: `@player MOVE 5 "RIGHT"` → `Move(EntityRef("player"), Number(5), String("RIGHT"))`
 - **`a.b.c`**: `Attribute(Attribute(Variable("a"), "b"), "c")`
+- **`a.b()`**: `MethodCall(Attribute(Variable("a"), "b"), "b", [])`
 - **`INT(...)`**: `FunctionCall("INT", [...])` (type keyword as function)
 - **`FUN foo()`**: no-param function (fixed)
+- **`IMPORT "utils.axc"`**: `Import("utils.axc")`
+- **`x += 1`**: `Assignment("x", BinaryOp(Variable("x"), "+", Number(1)))`
 
 ## Errors
 

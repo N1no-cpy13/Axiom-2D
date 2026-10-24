@@ -65,18 +65,17 @@ def run():
 
     runtime.load(ast)
 
-    # --- main loop ---
+        # --- main loop ---
     while runtime.running:
-        tick_start = time.time() 
+        tick_start = time.time()
         
-        world.tick() 
-        runtime.tick()
+        world.tick()      # Update entities (movement, collision)
+        runtime.tick()    # Execute AXM script until yield/program end
         
         elapsed = time.time() - tick_start
-        sleep_time = world_tick - elapsed 
+        sleep_time = world_tick - elapsed
         if sleep_time > 0:
             time.sleep(sleep_time)
-
 
 if __name__ == "__main__":
     try:

@@ -1,0 +1,77 @@
+// color.axc - Color utilities module (RGB)
+// Usage: IMPORT "axm/modules/color.axc"
+// Colors are lists: [r, g, b] (0-255)
+
+VAR __VERSION__ = "1.0"
+VAR __AUTHOR__ = "AXIOM TEAM"
+
+// Named colors
+VAR RED = [255, 0, 0]
+VAR GREEN = [0, 255, 0]
+VAR BLUE = [0, 0, 255]
+VAR WHITE = [255, 255, 255]
+VAR BLACK = [0, 0, 0]
+VAR YELLOW = [255, 255, 0]
+VAR CYAN = [0, 255, 255]
+VAR MAGENTA = [255, 0, 255]
+
+// Create RGB color
+FUN RGB(r, g, b)
+  RETURN [r, g, b]
+
+// Clamp color component to 0-255
+FUN ClampComponent(c)
+  IF c < 0
+    RETURN 0
+  IF c > 255
+    RETURN 255
+  RETURN c
+
+// Clamp color to valid range
+FUN Clamp(color)
+  RETURN [ClampComponent(color[0]), ClampComponent(color[1]), ClampComponent(color[2])]
+
+// Mix two colors (t = 0.0 to 1.0)
+FUN Mix(a, b, t)
+  VAR r = a[0] + (b[0] - a[0]) * t
+  VAR g = a[1] + (b[1] - a[1]) * t
+  VAR bl = a[2] + (b[2] - a[2]) * t
+  RETURN Clamp([r, g, bl])
+
+// Lighten color (amount = 0.0 to 1.0)
+FUN Lighten(color, amount)
+  RETURN Mix(color, WHITE, amount)
+
+// Darken color (amount = 0.0 to 1.0)
+FUN Darken(color, amount)
+  RETURN Mix(color, BLACK, amount)
+
+// Invert color
+FUN Invert(color)
+  RETURN [255 - color[0], 255 - color[1], 255 - color[2]]
+
+// Get brightness (0-255)
+FUN Brightness(color)
+  RETURN (color[0] + color[1] + color[2]) / 3
+
+// Check if color is dark
+FUN IsDark(color)
+  RETURN Brightness(color) < 128
+
+// Convert single component (0-255) to 2-digit hex
+FUN ToHexComponent(c)
+  // Clamp
+  IF c < 0
+    c = 0
+  IF c > 255
+    c = 255
+  // Integer division + modulo 
+  VAR high = FLOOR(c / 16)
+  VAR low = c - high * 16
+  // Hex digits
+  VAR hex_chars = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"]  
+  RETURN hex_chars[high] + hex_chars[low]
+  
+// Convert RGB color to hex string
+FUN ToHex(color)
+  RETURN "#" + ToHexComponent(color[0]) + ToHexComponent(color[1]) + ToHexComponent(color[2])

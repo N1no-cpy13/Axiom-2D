@@ -6,12 +6,13 @@ Converts AXM source code into tokens for the parser.
 
 ## Token Types
 
-- **Keywords**: `SAY`, `SAYF`, `IF`, `ELSE`, `ELIF`, `FOR`, `WHILE`, `DO`, `BREAK`, `FUN`, `RETURN`, `VAR`, `MOVE`, `DAMAGE`, `HEAL`, `SLEEP`, `IN`, `NOT`, `AND`, `OR`, `TRUE`, `FALSE`, `STR`, `INT`, `LIST`, `BOOL`, `NUM`
+- **Keywords**: `SAY`, `SAYF`, `IF`, `ELSE`, `ELIF`, `FOR`, `WHILE`, `DO`, `BREAK`, `FUN`, `RETURN`, `VAR`, `MOVE`, `DAMAGE`, `HEAL`, `SLEEP`, `IN`, `NOT`, `AND`, `OR`, `TRUE`, `FALSE`, `STR`, `INT`, `LIST`, `BOOL`, `NUM`, `IMPORT`
 - **Identifiers**: Variable/function names (letters, digits, underscore)
 - **Literals**: Numbers (int/float), strings (`"..."` or `'...'`), booleans (`TRUE`/`FALSE`)
 - **Directions**: `W`, `A`, `S`, `D`, `UP`, `DOWN`, `LEFT`, `RIGHT`, `TOP`, `BOTTOM`, `NORTH`, `SOUTH`, `EAST`, `WEST`, `UP_Z`, `DOWN_Z`, `ARROW_UP`, `ARROW_DOWN`, `ARROW_LEFT`, `ARROW_RIGHT`
 - **Time units**: `MS` (millisecond), `SEC` (second), `MINUTE` (minute)
 - **Operators**: `+`, `-`, `*`, `/`, `==`, `!=`, `>`, `<`, `>=`, `<=`
+- **Compound operators**: `+=`, `-=`, `*=`, `/=`
 - **Special**: `@` (entity ref), `.` (attr access), `(` `)` `[` `]` `,`, `=` (assign)
 - **Control**: `NEWLINE`, `INDENT`, `DEDENT`, `EOF`
 

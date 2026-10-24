@@ -1,0 +1,39 @@
+// utils.axc - General Utilities module 
+// Usage: IMPORT "axm/modules/utils.axc"
+
+// info //
+VAR __VERSION__ = "1.0"
+VAR __AUTHOR__ = "AXIOM TEAM"
+
+// clamp value between min and max //
+FUN Clamp(value, minv, maxv)
+  IF value < minv 
+    RETURN minv 
+  IF value > maxv
+    RETURN maxv
+  RETURN value 
+
+// Linear interpolation //
+FUN Lerp(a, b, t)
+  RETURN a + (b - a) * t 
+
+// Map value from one range to another //
+FUN Map(value, in_min, in_max, out_min, out_max)
+  VAR normalized = (value - in_min) / (in_max - in_min)
+  RETURN out_min + normalized * (out_max - out_min)
+
+// Sign (-1, 0, 1) //
+FUN Sign(x)
+  IF x > 0
+    RETURN 1
+  IF x < 0
+    RETURN -1
+  RETURN 0
+
+// Check if number is even //
+FUN IsEven(n)
+  RETURN MOD(n, 2) == 0
+
+// Check if number is odd //
+FUN IsOdd(n)
+  RETURN MOD(n, 2) != 0

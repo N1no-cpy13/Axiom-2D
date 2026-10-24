@@ -1,0 +1,53 @@
+// random.axc - Random utilities module
+// Usage: IMPORT "axm/modules/random.axc"
+
+VAR __VERSION__ = "1.0"
+VAR __AUTHOR__ = "AXIOM TEAM"
+
+// Random boolean (TRUE/FALSE)
+FUN Bool()
+  RETURN RANDOM(0, 1) == 1
+
+// Random choice from list
+FUN Choice(lst)
+  IF LEN(lst) == 0
+    RETURN NULL
+  VAR idx = RANDOM(0, LEN(lst) - 1)
+  RETURN lst[idx]
+
+// Shuffle list (returns new list)
+FUN Shuffle(lst)
+  VAR result = []
+  FOR i IN LEN(lst)
+    APPEND(result, lst[i])
+  VAR n = LEN(result)
+  VAR i = n - 1
+  WHILE i > 0 DO
+    VAR j = RANDOM(0, i)
+    VAR temp = result[i]
+    result[i] = result[j]
+    result[j] = temp
+    i = i - 1
+  RETURN result
+
+// Random float between min and max
+FUN Float(minv, maxv)
+  RETURN RAND_FLOAT(minv, maxv)
+
+// Random integer between min and max (inclusive)
+FUN Int(minv, maxv)
+  RETURN RANDOM(minv, maxv)
+
+// Random dice roll (1-6)
+FUN Dice()
+  RETURN RANDOM(1, 6)
+
+// Random coin flip
+FUN Coin()
+  IF RANDOM(0, 1) == 1
+    RETURN "HEADS"
+  RETURN "TAILS"
+
+// Random percentage (0-100)
+FUN Percent()
+  RETURN RANDOM(0, 100)

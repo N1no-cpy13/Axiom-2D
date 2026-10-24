@@ -6,7 +6,8 @@ KEYWORDS = {
     "VAR", "TRUE", "FALSE", "FUN", "RETURN", 
     "NOT", "AND", "OR", "WHILE", "DO", "ELIF",
     "HEAL",
-    "STR", "INT", "LIST", "BOOL", "NUM" 
+    "STR", "INT", "LIST", "BOOL", "NUM",
+    "IMPORT", "NULL"
 }
 DIRECTIONS = {
     # WASD
@@ -143,6 +144,22 @@ def lex(code: str):
                 continue
 
             # OPERATORS
+            if line.startswith("+=", pos):
+                tokens.append(Token("COMPOUND_OP", "+=", line_no))
+                pos += 2
+                continue
+            if line.startswith("-=", pos):
+                tokens.append(Token("COMPOUND_OP", "-=", line_no))
+                pos += 2
+                continue
+            if line.startswith("*=", pos):
+                tokens.append(Token("COMPOUND_OP", "*=", line_no))
+                pos += 2
+                continue 
+            if line.startswith("/=", pos):
+                tokens.append(Token("COMPOUND_OP", "/=", line_no))
+                pos += 2
+                continue
             if line.startswith("==", pos):
                 tokens.append(Token("OP", "==", line_no))
                 pos += 2
@@ -222,6 +239,8 @@ def lex(code: str):
             if word in KEYWORDS:
                 if word in {"TRUE", "FALSE"}:
                     tokens.append(Token("BOOLEAN", word == "TRUE", line_no))
+                elif word == "NULL":
+                    tokens.append(Token("NULL", None, line_no))
                 else:
                     tokens.append(Token(word, word, line_no))
             elif word in TIME_UNITS:

@@ -159,8 +159,21 @@ class Parser:
                     raise ParserError("Expected attribute name after '.'")
                 attr = self.cur().value 
                 self.eat("IDENT")
-                expr = Attribute(expr,attr)
-            
+                
+                # Check Method call 
+                if self.cur().type == "LPAREN":
+                    self.eat("LPAREN")
+                    args = []
+                    if self.cur().type != "RPAREN":
+                        args.append(self.parse_expression())
+                        while self.cur().type == "COMMA":
+                            self.eat("COMMA")
+                            args.append(self.parse_expression())
+                    self.eat("RPAREN")
+                    expr = MethodCall(Attribute(expr, attr), attr, args)
+                else:
+                    expr = Attribute(expr, attr)
+                    
             return expr 
             
         if token.type in ("INT", "STR", "LIST", "BOOL", "NUM"):
@@ -178,17 +191,30 @@ class Parser:
             
             if self.cur().type == "LPAREN":
                 return self.parse_function_call(name)
-            else:
-                expr = Variable(name)
             
-            # Attribute chain
+            expr = Variable(name)
+            
+            # Attribute chain + method call (a.b.c.d()...)
             while self.cur().type == "DOT":
                 self.eat("DOT")
                 if self.cur().type != "IDENT":
                     raise ParserError("Expected attribute name after '.'")
                 attr = self.cur().value 
                 self.eat("IDENT")
-                expr = Attribute(expr, attr)
+                
+                # Check method call 
+                if self.cur().type == "LPAREN":
+                    self.eat("LPAREN")
+                    args = []
+                    if self.cur().type != "RPAREN":
+                        args.append(self.parse_expression())
+                        while self.cur().type == "COMMA":
+                            self.eat("COMMA")
+                            args.append(self.parse_expression())
+                    self.eat("RPAREN")
+                    expr = MethodCall(Attribute(expr, attr), attr, args)
+                else:
+                    expr = Attribute(expr, attr)
             
             return expr
                 
@@ -206,6 +232,10 @@ class Parser:
             val = token.value 
             self.eat("BOOLEAN")
             return Boolean(val)
+            
+        elif token.type == "NULL":
+            self.eat("NULL")
+            return Null()
         
         elif token.type == "DIRECTION":
             val = token.value 
@@ -320,6 +350,14 @@ class Parser:
         
         if t.type == "FUN":
             return self.parse_function_def()
+        if t.type == "IMPORT":
+            self.eat("IMPORT")
+            if self.cur().type != "STRING":
+                raise ParserError(f"Expected string path after IMPORT, got {self.cur().type}")
+            path = self.cur().value 
+            self.eat("STRING")
+            self.skip_newlines()
+            return Import(path)
         if t.type == "RETURN":
             return self.parse_return()
         if t.type == "IF":
@@ -365,6 +403,18 @@ class Parser:
                 else:
                     # if not an assignment, return as expr 
                     return var_expr
+            
+            
+            # compound assignment
+            elif next_token and next_token.type == "COMPOUND_OP":
+                self.eat("IDENT")
+                op_token = self.cur()
+                self.eat("COMPOUND_OP")
+                value = self.parse_expression()
+                self.skip_newlines()
+                bin_op = op_token.value[0] # "+=" -> "+" 
+                expr = BinaryOp(Variable(name), bin_op, value)
+                return Assignment(name, expr)
             
             # regular assignment (name = value)
             elif next_token and next_token.type == "ASSIGN":
