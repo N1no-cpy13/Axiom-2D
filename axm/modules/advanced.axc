@@ -1,5 +1,0 @@
-IMPORT "math.axc"
-
-VAR name = "advanced"
-FUN CircleArea(r)
-  RETURN math.PI * math.Square(r)
