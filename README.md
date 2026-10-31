@@ -28,7 +28,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/Rizal-HID11/Axiom-2D.git
+git clone https://github.com/N1no-cpy13/Axiom-2D.git
 cd Axiom-2D
 
 # Run with default configuration
