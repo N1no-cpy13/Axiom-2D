@@ -20,6 +20,10 @@ def run():
     world_tick = config.get("WORLD_TICK", 0.01)
     axm_file = config["AXM_FILE_TO_RUN"]
     debug = config.get("DEBUG", False)
+    deprecation_mode = config.get("DEPRECATION_MODE", "warn")
+    
+    from axm.deprecation import set_warning_mode 
+    set_warning_mode(deprecation_mode)
 
     # --- create world ---
     world = World(world_name)

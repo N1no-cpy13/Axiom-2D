@@ -3,6 +3,7 @@
   "WORLD_TICK": 0.01,
   "AXM_FILE_TO_RUN": "testsuite.axm",
   "DEBUG": false,
+  "DEPRECATION_MODE": "warn",
   "WORLD_BOUNDS": {
     "min_x": 0,
     "max_x": 10,

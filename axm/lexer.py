@@ -4,12 +4,20 @@ KEYWORDS = {
     "SAY", "SAYF", "FOR", "IF", "ELSE", 
     "MOVE", "SLEEP", "DAMAGE", "IN", "BREAK", 
     "CONTINUE",
-    "VAR", "TRUE", "FALSE", "FUN", "RETURN", 
+    "VAR", "TRUE", "FALSE", "TASK", "RETURN", 
     "NOT", "AND", "OR", "WHILE", "DO", "ELIF",
     "HEAL",
     "STR", "INT", "LIST", "BOOL", "NUM",
     "IMPORT", "NULL"
 }
+
+# Deprecated keywords - still works, but warns user 
+# Map: deprecated -> new 
+DEPR_KEYWORDS = {
+    "FUN": "TASK",
+    # Maybe more?
+}
+
 DIRECTIONS = {
     # WASD
     "W", "A", "S", "D",
@@ -244,6 +252,11 @@ def lex(code: str):
                     tokens.append(Token("NULL", None, line_no))
                 else:
                     tokens.append(Token(word, word, line_no))
+            elif word in DEPR_KEYWORDS:
+                # Deprecated keyword - warn, but still works 
+                from .deprecation import warn_deprecated 
+                warn_deprecated(word, line_no)
+                tokens.append(Token(word, word, line_no))
             elif word in TIME_UNITS:
                 tokens.append(Token("TIME_UNIT", word, line_no))
             elif word in DIRECTIONS:
