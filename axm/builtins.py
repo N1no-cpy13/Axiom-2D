@@ -175,6 +175,28 @@ class Builtins:
         if delimeter is None:
             return t.split()
         return t.split(delimeter)
+        
+    # STRING METHODS 
+    def UPPER(self, s):
+        if not isinstance(s, str):
+            raise RuntimeError(f"UPPER: expected string, got {type(s).__name__}")
+        return s.upper()
+    def LOWER(self, s):
+        if not isinstance(s, str):
+            raise RuntimeError(f"LOWER: expected string, got {type(s).__name__}")
+        return s.lower()
+    def TRIM(self, s):
+        if not isinstance(s, str):
+            raise RuntimeError(f"TRIM: expected string, got {type(s).__name__}")
+        return s.strip()
+    def REPLACE(self, s, old, new):
+        if not isinstance(s, str):
+            raise RuntimeError(f"REPLACE: expected string, got {type(s).__name__}")
+        if not isinstance(old, str):
+            raise RuntimeError(f"REPLACE: old must be string, got {type(old).__name__}")
+        if not isinstance(new, str):
+            raise RuntimeError(f"REPLACE: new must be string, got {type(new).__name__}")
+        return s.replace(old, new)
     
     # IS_[TYPE] OPERATIONS
     def IS_INT(self, dt):
