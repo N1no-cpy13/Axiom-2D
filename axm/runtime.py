@@ -417,25 +417,37 @@ class Runtime:
 
         # FOR
         elif isinstance(node, For):
-            times = self.eval(node.times)
-            if not isinstance(times, int):
-                raise AXMRuntimeError("FOR loop times must be integer")
- 
-            self.push_scope({})
+            iterable = self.eval(node.times)
+            
+            if isinstance(iterable, int):
+                # FOR i IN 5 - range 0..4 
+                items = range(iterable)
+            elif isinstance(iterable, list):
+                # FOR item IN [1, 2, 3] - iterate list 
+                items = iterable
+            elif isinstance(iterable, str):
+                # FOR char IN "abc" - iterate string 
+                items = iterable
+            else:
+                raise AXMRuntimeError(f"FOR loop requires int, list, or string, got {type(iterable).__name__}")
+            
+            self.push_scope()
             
             try:
-                for i in range(times):
-                    self.current_scope()[node.var_name] = i 
+                for item in items:
+                    self.current_scope()[node.var_name] = item 
                     
                     result = self.execute_block(node.body)
                     if isinstance(result, BreakSignal):
                         break 
                     if isinstance(result, ContinueSignal):
-                        continue
+                        continue 
                     if isinstance(result, ReturnSignal):
                         return result 
             finally:
                 self.pop_scope()
+                    
+                    
 
 
         # VAR DECL
