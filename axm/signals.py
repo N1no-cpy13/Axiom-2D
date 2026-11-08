@@ -12,3 +12,7 @@ class ReturnSignal(Signal):
 class BreakSignal(Signal):
     def __repr__(self):
         return "BreakSignal"
+
+class ContinueSignal(Signal):
+    def __repr__(self):
+        return "ContinueSignal"

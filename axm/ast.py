@@ -148,6 +148,10 @@ class Break(Node):
     def __repr__(self):
         return "Break"
 
+class Continue(Node):
+    def __repr__(self):
+        return "Continue"
+
 class Import(Node):
     def __init__(self, path):
         self.path = path  # string 

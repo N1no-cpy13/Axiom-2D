@@ -2,7 +2,7 @@
 from .builtins import Builtins
 import time
 from .ast import *
-from .signals import Signal, ReturnSignal, BreakSignal
+from .signals import Signal, ReturnSignal, BreakSignal, ContinueSignal
 from .module_loader import ModuleLoader
 
 class AXMRuntimeError(Exception):
@@ -430,6 +430,8 @@ class Runtime:
                     result = self.execute_block(node.body)
                     if isinstance(result, BreakSignal):
                         break 
+                    if isinstance(result, ContinueSignal):
+                        continue
                     if isinstance(result, ReturnSignal):
                         return result 
             finally:
@@ -573,8 +575,11 @@ class Runtime:
 
         # BREAK
         elif isinstance(node, Break):
-            
             return BreakSignal()
+        
+        # CONTINUE
+        elif isinstance(node, Continue):
+            return ContinueSignal()
         
         # IF
         elif isinstance(node, If):
@@ -616,6 +621,7 @@ class Runtime:
             module_name = node.path.replace(".axc", "").split("/")[-1].split("\\")[-1]
             self.globals[module_name] = module 
         
+        # WHILE
         elif isinstance(node, While):
             MAX_ITERATIONS = getattr(self, 'max_while_iterations', 10000)
             iteration = 0
@@ -635,6 +641,11 @@ class Runtime:
 
                 if isinstance(result, BreakSignal):
                     break
+                    
+                if isinstance(result, ContinueSignal):
+                    iteration += 1
+                    
+                    continue
 
                 if isinstance(result, ReturnSignal):
                     return result

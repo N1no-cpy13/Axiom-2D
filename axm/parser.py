@@ -376,6 +376,10 @@ class Parser:
             self.eat("BREAK")
             self.skip_newlines()
             return Break()
+        if t.type == "CONTINUE":
+            self.eat("CONTINUE")
+            self.skip_newlines()
+            return Continue()
         if t.type == "VAR":
             return self.parse_var_declaration()
         

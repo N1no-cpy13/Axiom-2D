@@ -3,6 +3,7 @@
 KEYWORDS = {
     "SAY", "SAYF", "FOR", "IF", "ELSE", 
     "MOVE", "SLEEP", "DAMAGE", "IN", "BREAK", 
+    "CONTINUE",
     "VAR", "TRUE", "FALSE", "FUN", "RETURN", 
     "NOT", "AND", "OR", "WHILE", "DO", "ELIF",
     "HEAL",
