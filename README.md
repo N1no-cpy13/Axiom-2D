@@ -2,7 +2,7 @@
 # Axiom-2D
 # Tick-Based Game Engine
 
-![Version](https://img.shields.io/badge/version-0.3.0--alpha-blue)
+![Version](https://img.shields.io/badge/version-0.4.0--alpha-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Python](https://img.shields.io/badge/python-3.8%2B-yellow)
 
@@ -19,6 +19,7 @@
 - **Entity System** - Health, position, velocity, collision
 - **AXM Scripting Language** - Custom syntax with lexer, parser, runtime
 - **AXC Module System** - Import `.axc` modules, namespaces, nested imports
+- **Deprecation System** - Warn user about old syntax (configurable)
 - **JSON Configuration** - Easy world setup
 - **No Dependencies** - Pure Python standard library
 
@@ -71,7 +72,7 @@ python axiom.py
 
 ```axm
 VAR version = "1.0"
-FUN Add(a, b)
+TASK Add(a, b)
   RETURN a + b
 ```
 
@@ -100,6 +101,40 @@ SAYF "1 + 2 = {utils.Add(1, 2)}"
 
 ---
 
+## Deprecation System
+
+Deprecated syntax still works, but warns user.
+
+**Config** (`GAME_CONFIG.json`):
+
+```json
+"DEPRECATION_MODE": "warn"
+```
+
+| Mode | Behavior |
+|------|----------|
+| `"warn"` | Print warning, continue (default) |
+| `"error"` | Raise `SyntaxError`, stop script |
+| `"ignore"` | No warning, continue |
+
+**Deprecated**:
+
+- `FUN` → **use `TASK`** (still works, warns user)
+
+**Example**:
+
+```axm
+// Deprecated (warns)
+FUN add(a, b)
+  RETURN a + b
+
+// New (no warning)
+TASK add(a, b)
+  RETURN a + b
+```
+
+---
+
 ## Example Modules
 
 ```
@@ -108,8 +143,8 @@ axm/modules/
 ├── string.axc        — String utilities (Upper, Lower, Join, Replace, dll)
 ├── array.axc         — Array utilities (Sum, Average, Max, Min, Reverse, dll)
 ├── random.axc        — Random utilities (Bool, Choice, Shuffle, Dice, dll)
-├── vector.axc        — Vector math (Vec2, Vec3, Add, Dot, Distance, dll)
-├── color.axc         — Color utilities (RGB, Mix, Lighten, Invert, dll)
+├── vector.axc        — Vector math (Add, Dot, Distance, Rotate2D, dll)
+├── color.axc         — Color utilities (RGB, Mix, Lighten, Invert, ToHex, dll)
 └── validation.axc    — Validation (IsEmpty, IsNumeric, IsEmail, dll)
 ```
 
@@ -138,7 +173,8 @@ Documentations/
 │   ├── runtime.md
 │   ├── Lexer.md
 │   ├── Signals.md
-│   └── ModuleLoader.md
+│   ├── ModuleLoader.md
+│   └── Deprecation.md
 ├── axc/
 │   ├── README.md
 │   ├── syntax.md
@@ -168,6 +204,7 @@ Edit `GAME_CONFIG.json`:
   "AXM_FILE_TO_RUN": "test1.axm",
   "DEBUG": true,
   "MAX_WHILE_ITERATIONS": 10000,
+  "DEPRECATION_MODE": "warn",
   "WORLD_BOUNDS": {
     "min_x": 0,
     "max_x": 10,
@@ -197,13 +234,19 @@ Edit `GAME_CONFIG.json`:
 - `MIN_Z`/`MAX_Z` **optional** — if not set, z-axis is infinite
 - `MAX_WHILE_ITERATIONS` **optional** — default 10000 (prevent infinite loop)
 - `DEBUG` **optional** — default false (print `[TICK]` logs if true)
+- `DEPRECATION_MODE` **optional** — default `"warn"` (`"warn"`, `"error"`, `"ignore"`)
 
 ---
 
-## 🐛 Recent Changes (v0.3.0-alpha)
+## 🐛 Recent Changes (v0.4.0-alpha)
 
 ### 🚀 New Features
 
+- **`TASK` keyword**: replaces `FUN` (function keyword)
+- **Deprecation system**: `FUN` deprecated, warns user, still works
+- **`DEPRECATION_MODE`**: `warn`/`error`/`ignore`
+- **`CONTINUE`**: skip iteration in `FOR`/`WHILE`
+- **`FOR ... IN`**: iterate list/string (in addition to int)
 - **Module system** (`.axc`): `IMPORT`, namespace, nested import, circular check
 - **`NULL` keyword**: falsy value, list support, module export
 - **Compound assignment**: `+=`, `-=`, `*=`, `/=`
@@ -212,6 +255,7 @@ Edit `GAME_CONFIG.json`:
 
 ### ⚠️ Breaking Changes
 
+- `FUN` → **deprecated**, use `TASK` (warning, but still works)
 - `SLEEP 5 S` → **error**, use `SLEEP 5 SEC`
 - `SLEEP 1 MIN` → **error**, use `SLEEP 1 MINUTE`
 - `VAR` in function/IF/WHILE/FOR → **local**, no longer leaks to global
@@ -236,7 +280,7 @@ Edit `GAME_CONFIG.json`:
   - `TAN` fix (was `tanh`)
   - `HEAL` return health
 - **Parser:**
-  - `FUN foo()` no-param fix
+  - `TASK` / `FUN` handling (both work)
   - Unary minus (`-5`, `3 + -2`)
   - NUMBER break on operators (`1+1` without space)
   - `Parameter.__repr__` truthy fix

@@ -6,7 +6,8 @@ Converts AXM source code into tokens for the parser.
 
 ## Token Types
 
-- **Keywords**: `SAY`, `SAYF`, `IF`, `ELSE`, `ELIF`, `FOR`, `WHILE`, `DO`, `BREAK`, `CONTINUE`, `FUN`, `RETURN`, `VAR`, `MOVE`, `DAMAGE`, `HEAL`, `SLEEP`, `IN`, `NOT`, `AND`, `OR`, `TRUE`, `FALSE`, `STR`, `INT`, `LIST`, `BOOL`, `NUM`, `IMPORT`, `NULL`
+- **Keywords**: `SAY`, `SAYF`, `IF`, `ELSE`, `ELIF`, `FOR`, `WHILE`, `DO`, `BREAK`, `CONTINUE`, `TASK`, `RETURN`, `VAR`, `MOVE`, `DAMAGE`, `HEAL`, `SLEEP`, `IN`, `NOT`, `AND`, `OR`, `TRUE`, `FALSE`, `STR`, `INT`, `LIST`, `BOOL`, `NUM`, `IMPORT`, `NULL`
+- **Deprecated keywords**: `FUN` (use `TASK` instead)
 - **Identifiers**: Variable/function names (letters, digits, underscore)
 - **Literals**: Numbers (int/float), strings (`"..."` or `'...'`), booleans (`TRUE`/`FALSE`), null (`NULL`)
 - **Directions**: `W`, `A`, `S`, `D`, `UP`, `DOWN`, `LEFT`, `RIGHT`, `TOP`, `BOTTOM`, `NORTH`, `SOUTH`, `EAST`, `WEST`, `UP_Z`, `DOWN_Z`, `ARROW_UP`, `ARROW_DOWN`, `ARROW_LEFT`, `ARROW_RIGHT`
@@ -15,6 +16,15 @@ Converts AXM source code into tokens for the parser.
 - **Compound operators**: `+=`, `-=`, `*=`, `/=`
 - **Special**: `@` (entity ref), `.` (attr access), `(` `)` `[` `]` `,`, `=` (assign)
 - **Control**: `NEWLINE`, `INDENT`, `DEDENT`, `EOF`
+
+### Deprecated Keywords 
+
+`FUN` is deprecated - use `TASK` instead. Lexer will:
+1. Emit `[AXIOM WARNING]` Deprecated syntax `FUN` - use `TASK` instead.`
+2. Still tokenize `FUN` as `Token("FUN", "FUN")` (works)
+3. Check `DEPRECATED_MODE` (config) - `warn`/`error`/`ignore`
+
+See `Deprecation.md` for details. 
 
 ## Indentation
 
