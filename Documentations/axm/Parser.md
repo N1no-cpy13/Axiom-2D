@@ -11,6 +11,7 @@ Supports:
 - **Compound assignment:** `x += 1`, `x -= 1`, `x *= 2`, `x /= 2`
 - **Conditionals:** `IF cond`, `ELIF cond`, `ELSE` (indent-based, no braces)
 - **Loops:** `FOR i IN 5`, `WHILE cond DO` (indent-based)
+- **Loop control:** `BREAK`, `CONTINUE`
 - **Functions:** `FUN name(params)`, `RETURN`, default params `b = 0`, type annotation `a: INT`
 - **Entity actions:** `@player MOVE 5 "RIGHT"`, `@enemy DAMAGE 10`, `@player HEAL 10`
 - **I/O:** `SAY`, `SAYF` (f-strings with `{expr}`)
@@ -21,6 +22,7 @@ Supports:
 - **Unary minus/plus:** `-5`, `3 + -2`
 - **Type keywords as function:** `INT("42")`, `STR(42)`, `BOOL(1)`, `LIST(1,2,3)`, `NUM("3.14")`
 - **Import:** `IMPORT "path/to/module.axc"`
+- **NULL:** `NULL` literal (falsy)
 
 ## Operator Precedence
 
@@ -41,6 +43,9 @@ Supports:
 - **`FUN foo()`**: no-param function (fixed)
 - **`IMPORT "utils.axc"`**: `Import("utils.axc")`
 - **`x += 1`**: `Assignment("x", BinaryOp(Variable("x"), "+", Number(1)))`
+- **`BREAK`**: `Break()`
+- **`CONTINUE`**: `Continue()`
+- **`NULL`**: `Null()`
 
 ## Errors
 

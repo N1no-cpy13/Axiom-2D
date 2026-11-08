@@ -6,7 +6,7 @@ Quick reference for AXM language syntax.
 - The AXM Language indent uses **2** spaces per level. Required for all blocks.
 - The `DO` keyword is used in `WHILE` but **not** in `IF`, `ELIF`, `FOR`.
 - `VAR` inside `IF`/`WHILE`/`FOR`/function is **local** (does not leak to global).
-- **Yield points** (`MOVE`, `DAMAGE`, `HEAL`, `SLEEP`) only work at **top-level** (not inside nested blocks).
+- **Yield points** (`MOVE`, `DAMAGE`, `HEAL`) only work at **top-level** (not inside nested blocks).
 
 ## Comments
 
@@ -23,6 +23,7 @@ Quick reference for AXM language syntax.
 | Float | `3.14` |
 | String | `"Hello"` or `'Hello'` |
 | Boolean | `TRUE`, `FALSE` |
+| Null | `NULL` |
 | List | `[1, 2, 3]` |
 
 ---
@@ -32,6 +33,12 @@ Quick reference for AXM language syntax.
     VAR name = "Player"        // Declaration
     health = 75                // Assignment
     items[0] = 10              // Index assignment
+
+    // Compound assignment
+    health += 10               // health = health + 10
+    health -= 5                // health = health - 5
+    health *= 2                // health = health * 2
+    health /= 2                // health = health / 2
 
 ---
 
@@ -72,6 +79,14 @@ Quick reference for AXM language syntax.
 - `BREAK` can be used in `FOR`, `WHILE` to stop loop execution. Must be inside the loop body.
 - `BREAK` not designed to be inside `FUN` (except if there is a loop there), `IF`, `ELSE`, `ELIF`.
 
+### CONTINUE
+
+    CONTINUE
+
+**Notes**:
+- `CONTINUE` skips the current iteration and continues to the next one.
+- Can be used in `FOR`, `WHILE`. Must be inside the loop body.
+
 ### Functions
 
     FUN name(param1, param2)
@@ -91,6 +106,14 @@ Quick reference for AXM language syntax.
     @player.x
     @enemy.health
     @npc.IsAlive
+
+**Method Call** (Entity method):
+
+    @player.damage(10)         // call Entity.damage()
+    @player.update(world)      // call Entity.update()
+
+**Note**: only methods that exist on `Entity` class can be called.
+`heal()` and `move()` are **builtin statements**, not Entity methods.
 
 ---
 
@@ -186,3 +209,18 @@ Quick reference for AXM language syntax.
       SLEEP 500 MS
 
     SAYF "Final score: {score}"
+
+---
+
+## Import (Module System)
+
+    IMPORT "path/to/module.axc"
+
+    module_name.variable        // global variable
+    module_name.Function()      // function call
+
+**Example**:
+
+    IMPORT "axm/modules/math.axc"
+    SAYF "PI = {math.PI}"
+    SAYF "Square(5) = {math.Square(5)}"

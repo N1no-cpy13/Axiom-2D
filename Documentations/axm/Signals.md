@@ -9,6 +9,7 @@ Implements control flow using marker objects (not exceptions).
 - `Signal` - Base marker class (not an Exception)
 - `ReturnSignal(value)` - Returned by `RETURN` statements, caught by function calls
 - `BreakSignal` - Returned by `BREAK` statements, caught by loops
+- `ContinueSignal` - Returned by `CONTINUE` statements, caught by loops
 
 ## Usage
 
@@ -28,7 +29,19 @@ returning them from `execute_node` and `execute_block`.
         value = self.eval(node.value) if node.value else None
         return ReturnSignal(value)
 
+    elif isinstance(node, Break):
+        return BreakSignal()
+
+    elif isinstance(node, Continue):
+        return ContinueSignal()
+
     # In execute_block:
     result = self.execute_node(stmt)
     if isinstance(result, Signal):
         return result  # propagate
+
+    # In For loop:
+    if isinstance(result, BreakSignal):
+        break
+    if isinstance(result, ContinueSignal):
+        continue

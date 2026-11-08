@@ -6,9 +6,9 @@ Converts AXM source code into tokens for the parser.
 
 ## Token Types
 
-- **Keywords**: `SAY`, `SAYF`, `IF`, `ELSE`, `ELIF`, `FOR`, `WHILE`, `DO`, `BREAK`, `FUN`, `RETURN`, `VAR`, `MOVE`, `DAMAGE`, `HEAL`, `SLEEP`, `IN`, `NOT`, `AND`, `OR`, `TRUE`, `FALSE`, `STR`, `INT`, `LIST`, `BOOL`, `NUM`, `IMPORT`
+- **Keywords**: `SAY`, `SAYF`, `IF`, `ELSE`, `ELIF`, `FOR`, `WHILE`, `DO`, `BREAK`, `CONTINUE`, `FUN`, `RETURN`, `VAR`, `MOVE`, `DAMAGE`, `HEAL`, `SLEEP`, `IN`, `NOT`, `AND`, `OR`, `TRUE`, `FALSE`, `STR`, `INT`, `LIST`, `BOOL`, `NUM`, `IMPORT`, `NULL`
 - **Identifiers**: Variable/function names (letters, digits, underscore)
-- **Literals**: Numbers (int/float), strings (`"..."` or `'...'`), booleans (`TRUE`/`FALSE`)
+- **Literals**: Numbers (int/float), strings (`"..."` or `'...'`), booleans (`TRUE`/`FALSE`), null (`NULL`)
 - **Directions**: `W`, `A`, `S`, `D`, `UP`, `DOWN`, `LEFT`, `RIGHT`, `TOP`, `BOTTOM`, `NORTH`, `SOUTH`, `EAST`, `WEST`, `UP_Z`, `DOWN_Z`, `ARROW_UP`, `ARROW_DOWN`, `ARROW_LEFT`, `ARROW_RIGHT`
 - **Time units**: `MS` (millisecond), `SEC` (second), `MINUTE` (minute)
 - **Operators**: `+`, `-`, `*`, `/`, `==`, `!=`, `>`, `<`, `>=`, `<=`
@@ -31,6 +31,11 @@ Converts AXM source code into tokens for the parser.
 - Integers: `123`
 - Floats: `1.5`
 - Breaks on whitespace, brackets, and operators (`1+1` → `NUMBER(1)`, `OP(+)`, `NUMBER(1)`)
+
+## NULL
+
+- `NULL` → `Token("NULL", None)`
+- Used as literal for null value (falsy)
 
 ## Errors
 

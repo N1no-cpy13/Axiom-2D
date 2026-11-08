@@ -11,7 +11,6 @@ Executes the AST and manages program state.
 - **Functions** - User-defined functions
 - **Program counter** - Current execution position (`pc`)
 - **Module loader** - Load `.axc` modules (`module_loader`)
-- **Imported modules** - Cached modules (`loaded_modules`)
 
 ## Execution Flow
 
@@ -20,12 +19,12 @@ Executes the AST and manages program state.
    - Loop: execute node until yield point (`MOVE`, `DAMAGE`, `HEAL`) or program end
    - Yield points only at **top-level** (nested blocks execute immediately)
 3. Statements evaluated, builtins called, entities modified
-4. Control flow via `ReturnSignal` and `BreakSignal` (marker objects, not exceptions)
+4. Control flow via `ReturnSignal`, `BreakSignal`, `ContinueSignal` (marker objects, not exceptions)
 
 ## Expression Evaluation
 
 Handles:
-- Numbers, strings, booleans
+- Numbers, strings, booleans, null
 - Variables (scope lookup with Levenshtein suggestion)
 - Entity refs (`@player`)
 - Attributes (`@player.health`, `a.b.c`)
@@ -33,9 +32,9 @@ Handles:
 - Logical ops (`AND`, `OR`, `NOT`)
 - Function calls (user + builtins)
 - Lists, indexing
-- **Method calls** (`@player.damage(10)`, `obj.method(args)`)
-- **Module attribute** (`utils.version`, `math.PI`)
-- **Module function** (`utils.Add(1, 2)`, `math.Square(5)`)
+- Method calls (`@player.damage(10)`, `obj.method(args)`)
+- Module attribute (`utils.version`, `math.PI`)
+- Module function (`utils.Add(1, 2)`, `math.Square(5)`)
 
 ## Scope Rules
 
@@ -46,25 +45,10 @@ Handles:
 - **`Assignment`** (`x = 5`) → search scope first (inner → outer), then global
 - **Module** → isolated scope (`Module.globals`, `Module.functions`)
 
-## Module System
+## Loop Control
 
-**Import** (`IMPORT "utils.axc"`):
-
-- `module_loader.load("utils.axc")` → `Module` object
-- Module saved to `globals["utils"]`
-- Access: `utils.version`, `utils.Add(1, 2)`
-
-**Attribute** (`utils.version`):
-
-- `eval(Attribute(Variable("utils"), "version"))`
-- `obj = eval(Variable("utils"))` → `Module`
-- `if attr_name in obj.globals: return obj.globals[attr_name]`
-
-**Function call** (`utils.Add(1, 2)`):
-
-- `eval(MethodCall(Attribute(Variable("utils"), "Add"), [1, 2]))`
-- `obj = eval(Attribute(...))` → `BoundModuleFunction`
-- `if isinstance(obj, BoundModuleFunction): return obj.call([1, 2])`
+- **`BREAK`** → `BreakSignal` → exit loop
+- **`CONTINUE`** → `ContinueSignal` → skip iteration, continue to next
 
 ## While Guard
 
