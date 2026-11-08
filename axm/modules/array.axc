@@ -5,20 +5,20 @@ VAR __VERSION__ = "1.0"
 VAR __AUTHOR__ = "AXIOM TEAM"
 
 // Sum all elements in list
-FUN Sum(lst)
+TASK Sum(lst)
   VAR total = 0
   FOR i IN LEN(lst)
     total = total + lst[i]
   RETURN total
 
 // Average of list
-FUN Average(lst)
+TASK Average(lst)
   IF LEN(lst) == 0
     RETURN 0
   RETURN Sum(lst) / LEN(lst)
 
 // Find max value
-FUN Max(lst)
+TASK Max(lst)
   IF LEN(lst) == 0
     RETURN 0
   VAR maxv = lst[0]
@@ -28,7 +28,7 @@ FUN Max(lst)
   RETURN maxv
 
 // Find min value
-FUN Min(lst)
+TASK Min(lst)
   IF LEN(lst) == 0
     RETURN 0
   VAR minv = lst[0]
@@ -38,7 +38,7 @@ FUN Min(lst)
   RETURN minv
 
 // Reverse list (returns new list)
-FUN Reverse(lst)
+TASK Reverse(lst)
   VAR result = []
   VAR i = LEN(lst) - 1
   WHILE i >= 0 DO
@@ -47,23 +47,23 @@ FUN Reverse(lst)
   RETURN result
 
 // Check if list is empty
-FUN IsEmpty(lst)
+TASK IsEmpty(lst)
   RETURN LEN(lst) == 0
 
 // Get first element
-FUN First(lst)
+TASK First(lst)
   IF LEN(lst) == 0
     RETURN NULL
   RETURN lst[0]
 
 // Get last element
-FUN Last(lst)
+TASK Last(lst)
   IF LEN(lst) == 0
     RETURN NULL
   RETURN lst[LEN(lst) - 1]
 
 // Slice list (start, end) - end exclusive
-FUN Slice(lst, start, end)
+TASK Slice(lst, start, end)
   VAR result = []
   VAR i = start
   WHILE i < end DO
@@ -74,14 +74,14 @@ FUN Slice(lst, start, end)
 
 // Filter list by predicate (returns list of values where predicate true)
 // Note: AXM Don't have function pointer, so we use threshold here
-FUN FilterGreater(lst, threshold)
+TASK FilterGreater(lst, threshold)
   VAR result = []
   FOR i IN LEN(lst)
     IF lst[i] > threshold
       APPEND(result, lst[i])
   RETURN result
 
-FUN FilterLess(lst, threshold)
+TASK FilterLess(lst, threshold)
   VAR result = []
   FOR i IN LEN(lst)
     IF lst[i] < threshold
@@ -89,7 +89,7 @@ FUN FilterLess(lst, threshold)
   RETURN result
 
 // Count occurrences of item
-FUN Count(lst, item)
+TASK Count(lst, item)
   VAR count = 0
   FOR i IN LEN(lst)
     IF lst[i] == item

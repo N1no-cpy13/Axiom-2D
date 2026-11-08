@@ -16,11 +16,11 @@ VAR CYAN = [0, 255, 255]
 VAR MAGENTA = [255, 0, 255]
 
 // Create RGB color
-FUN RGB(r, g, b)
+TASK RGB(r, g, b)
   RETURN [r, g, b]
 
 // Clamp color component to 0-255
-FUN ClampComponent(c)
+TASK ClampComponent(c)
   IF c < 0
     RETURN 0
   IF c > 255
@@ -28,38 +28,38 @@ FUN ClampComponent(c)
   RETURN c
 
 // Clamp color to valid range
-FUN Clamp(color)
+TASK Clamp(color)
   RETURN [ClampComponent(color[0]), ClampComponent(color[1]), ClampComponent(color[2])]
 
 // Mix two colors (t = 0.0 to 1.0)
-FUN Mix(a, b, t)
+TASK Mix(a, b, t)
   VAR r = a[0] + (b[0] - a[0]) * t
   VAR g = a[1] + (b[1] - a[1]) * t
   VAR bl = a[2] + (b[2] - a[2]) * t
   RETURN Clamp([r, g, bl])
 
 // Lighten color (amount = 0.0 to 1.0)
-FUN Lighten(color, amount)
+TASK Lighten(color, amount)
   RETURN Mix(color, WHITE, amount)
 
 // Darken color (amount = 0.0 to 1.0)
-FUN Darken(color, amount)
+TASK Darken(color, amount)
   RETURN Mix(color, BLACK, amount)
 
 // Invert color
-FUN Invert(color)
+TASK Invert(color)
   RETURN [255 - color[0], 255 - color[1], 255 - color[2]]
 
 // Get brightness (0-255)
-FUN Brightness(color)
+TASK Brightness(color)
   RETURN (color[0] + color[1] + color[2]) / 3
 
 // Check if color is dark
-FUN IsDark(color)
+TASK IsDark(color)
   RETURN Brightness(color) < 128
 
 // Convert single component (0-255) to 2-digit hex
-FUN ToHexComponent(c)
+TASK ToHexComponent(c)
   // Clamp
   IF c < 0
     c = 0
@@ -73,5 +73,5 @@ FUN ToHexComponent(c)
   RETURN hex_chars[high] + hex_chars[low]
   
 // Convert RGB color to hex string
-FUN ToHex(color)
+TASK ToHex(color)
   RETURN "#" + ToHexComponent(color[0]) + ToHexComponent(color[1]) + ToHexComponent(color[2])

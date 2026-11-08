@@ -5,11 +5,11 @@ VAR __VERSION__ = "1.0"
 VAR __AUTHOR__ = "AXIOM TEAM"
 
 // Check if string is empty
-FUN IsEmpty(s)
+TASK IsEmpty(s)
   RETURN LEN(s) == 0
 
 // Check if string is whitespace only
-FUN IsWhitespace(s)
+TASK IsWhitespace(s)
   IF LEN(s) == 0
     RETURN TRUE
   FOR i IN LEN(s)
@@ -18,7 +18,7 @@ FUN IsWhitespace(s)
   RETURN TRUE
 
 // Check if string is numeric (integer)
-FUN IsNumeric(s)
+TASK IsNumeric(s)
   IF LEN(s) == 0
     RETURN FALSE
   VAR start = 0
@@ -33,7 +33,7 @@ FUN IsNumeric(s)
   RETURN TRUE
 
 // Check if string is alphabetic (a-z, A-Z)
-FUN IsAlpha(s)
+TASK IsAlpha(s)
   IF LEN(s) == 0
     RETURN FALSE
   FOR i IN LEN(s)
@@ -67,19 +67,19 @@ FUN IsAlpha(s)
   RETURN TRUE
 
 // Validate range (inclusive)
-FUN InRange(value, minv, maxv)
+TASK InRange(value, minv, maxv)
   RETURN value >= minv AND value <= maxv
 
 // Validate positive number
-FUN IsPositive(n)
+TASK IsPositive(n)
   RETURN n > 0
 
 // Validate negative number
-FUN IsNegative(n)
+TASK IsNegative(n)
   RETURN n < 0
 
 // Validate email (simple check for "@" and ".")
-FUN IsEmail(s)
+TASK IsEmail(s)
   VAR has_at = FALSE
   VAR has_dot = FALSE
   FOR i IN LEN(s)

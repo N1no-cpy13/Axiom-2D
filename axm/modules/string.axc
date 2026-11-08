@@ -5,7 +5,7 @@ VAR __VERSION__ = "1.1"
 VAR __AUTHOR__ = "AXIOM TEAM"
 
 // Uppercase (FULL ASCII VERSION)
-FUN Upper(s)
+TASK Upper(s)
   VAR result = ""
   FOR i IN LEN(s)
     VAR c = s[i]
@@ -66,7 +66,7 @@ FUN Upper(s)
   RETURN result
 
 // Lowercase (FULL ASCII VERSION)
-FUN Lower(s)
+TASK Lower(s)
   VAR result = ""
   FOR i IN LEN(s)
     VAR c = s[i]
@@ -127,7 +127,7 @@ FUN Lower(s)
   RETURN result
 
 // Join list with separator
-FUN Join(lst, sep)
+TASK Join(lst, sep)
   VAR result = ""
   FOR i IN LEN(lst)
     IF i > 0
@@ -136,14 +136,14 @@ FUN Join(lst, sep)
   RETURN result
 
 // Repeat string n times
-FUN Repeat(s, n)
+TASK Repeat(s, n)
   VAR result = ""
   FOR i IN n
     result = result + s
   RETURN result
 
 // Check if string starts with prefix
-FUN StartsWith(s, prefix)
+TASK StartsWith(s, prefix)
   IF LEN(prefix) > LEN(s)
     RETURN FALSE
   VAR sub = ""
@@ -152,7 +152,7 @@ FUN StartsWith(s, prefix)
   RETURN sub == prefix
 
 // Check if string ends with suffix
-FUN EndsWith(s, suffix)
+TASK EndsWith(s, suffix)
   IF LEN(suffix) > LEN(s)
     RETURN FALSE
   VAR start = LEN(s) - LEN(suffix)
@@ -162,7 +162,7 @@ FUN EndsWith(s, suffix)
   RETURN sub == suffix
 
 // Trim leading/trailing spaces
-FUN Trim(s)
+TASK Trim(s)
   VAR start = 0
   VAR end = LEN(s)
   WHILE start < end AND s[start] == " " DO
@@ -175,7 +175,7 @@ FUN Trim(s)
   RETURN result
 
 // Reverse string
-FUN Reverse(s)
+TASK Reverse(s)
   VAR result = ""
   VAR i = LEN(s) - 1
   WHILE i >= 0 DO
@@ -184,7 +184,7 @@ FUN Reverse(s)
   RETURN result
 
 // Replace all occurrences
-FUN Replace(s, old, new)
+TASK Replace(s, old, new)
   VAR result = ""
   VAR i = 0
   WHILE i < LEN(s) DO
@@ -203,13 +203,13 @@ FUN Replace(s, old, new)
   RETURN result
 
 // Character at index
-FUN CharAt(s, idx)
+TASK CharAt(s, idx)
   IF idx < 0 OR idx >= LEN(s)
     RETURN ""
   RETURN s[idx]
 
 // Index of substring (-1 if not found)
-FUN IndexOf(s, sub)
+TASK IndexOf(s, sub)
   VAR i = 0
   WHILE i + LEN(sub) <= LEN(s) DO
     VAR match = TRUE
@@ -223,7 +223,7 @@ FUN IndexOf(s, sub)
   RETURN -1
 
 // Substring (start, length)
-FUN Substring(s, start, length)
+TASK Substring(s, start, length)
   VAR result = ""
   FOR i IN length
     IF start + i < LEN(s)

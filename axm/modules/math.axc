@@ -10,56 +10,56 @@ VAR E = 2.71828
 VAR TAU = 6.28318
 
 // Basic operations
-FUN Square(x)
+TASK Square(x)
   RETURN x * x
 
-FUN Cube(x)
+TASK Cube(x)
   RETURN x * x * x
 
-FUN Power(base, exp)
+TASK Power(base, exp)
   RETURN base ** exp
 
-FUN Sqrt(x)
+TASK Sqrt(x)
   IF x < 0
     RETURN -1
   RETURN SQRT(x)
 
 // Geometry
-FUN CircleArea(r)
+TASK CircleArea(r)
   RETURN PI * r * r
 
-FUN CircleCircumference(r)
+TASK CircleCircumference(r)
   RETURN TAU * r
 
-FUN RectangleArea(w, h)
+TASK RectangleArea(w, h)
   RETURN w * h
 
-FUN TriangleArea(base, height)
+TASK TriangleArea(base, height)
   RETURN (base * height) / 2
 
-FUN SphereVolume(r)
+TASK SphereVolume(r)
   RETURN (4 / 3) * PI * r * r * r
 
-FUN CylinderVolume(r, h)
+TASK CylinderVolume(r, h)
   RETURN PI * r * r * h
 
 // Distance
-FUN Distance2D(x1, y1, x2, y2)
+TASK Distance2D(x1, y1, x2, y2)
   VAR dx = x2 - x1
   VAR dy = y2 - y1
   RETURN SQRT(dx * dx + dy * dy)
 
-FUN Distance3D(x1, y1, z1, x2, y2, z2)
+TASK Distance3D(x1, y1, z1, x2, y2, z2)
   VAR dx = x2 - x1
   VAR dy = y2 - y1
   VAR dz = z2 - z1
   RETURN SQRT(dx * dx + dy * dy + dz * dz)
 
 // Interpolation
-FUN Lerp(a, b, t)
+TASK Lerp(a, b, t)
   RETURN a + (b - a) * t
 
-FUN Clamp(value, minv, maxv)
+TASK Clamp(value, minv, maxv)
   IF value < minv
     RETURN minv
   IF value > maxv
@@ -67,20 +67,20 @@ FUN Clamp(value, minv, maxv)
   RETURN value
 
 // Angle conversion
-FUN DegToRad(deg)
+TASK DegToRad(deg)
   RETURN deg * PI / 180
 
-FUN RadToDeg(rad)
+TASK RadToDeg(rad)
   RETURN rad * 180 / PI
 
 // Check number properties
-FUN IsEven(n)
+TASK IsEven(n)
   RETURN MOD(n, 2) == 0
 
-FUN IsOdd(n)
+TASK IsOdd(n)
   RETURN MOD(n, 2) != 0
 
-FUN IsPrime(n)
+TASK IsPrime(n)
   IF n < 2
     RETURN FALSE
   VAR i = 2
@@ -91,7 +91,7 @@ FUN IsPrime(n)
   RETURN TRUE
 
 // Factorial
-FUN Factorial(n)
+TASK Factorial(n)
   IF n < 0
     RETURN -1
   IF n == 0 OR n == 1
@@ -102,7 +102,7 @@ FUN Factorial(n)
   RETURN result
 
 // Fibonacci
-FUN Fibonacci(n)
+TASK Fibonacci(n)
   IF n < 0
     RETURN -1
   IF n <= 1
@@ -116,7 +116,7 @@ FUN Fibonacci(n)
   RETURN b
 
 // GCD (Greatest Common Divisor)
-FUN GCD(a, b)
+TASK GCD(a, b)
   WHILE b != 0 DO
     VAR temp = b
     b = MOD(a, b)
@@ -124,5 +124,5 @@ FUN GCD(a, b)
   RETURN a
 
 // LCM (Least Common Multiple)
-FUN LCM(a, b)
+TASK LCM(a, b)
   RETURN (a * b) / GCD(a, b)

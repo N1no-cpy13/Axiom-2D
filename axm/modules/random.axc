@@ -5,18 +5,18 @@ VAR __VERSION__ = "1.0"
 VAR __AUTHOR__ = "AXIOM TEAM"
 
 // Random boolean (TRUE/FALSE)
-FUN Bool()
+TASK Bool()
   RETURN RANDOM(0, 1) == 1
 
 // Random choice from list
-FUN Choice(lst)
+TASK Choice(lst)
   IF LEN(lst) == 0
     RETURN NULL
   VAR idx = RANDOM(0, LEN(lst) - 1)
   RETURN lst[idx]
 
 // Shuffle list (returns new list)
-FUN Shuffle(lst)
+TASK Shuffle(lst)
   VAR result = []
   FOR i IN LEN(lst)
     APPEND(result, lst[i])
@@ -31,23 +31,23 @@ FUN Shuffle(lst)
   RETURN result
 
 // Random float between min and max
-FUN Float(minv, maxv)
+TASK Float(minv, maxv)
   RETURN RAND_FLOAT(minv, maxv)
 
 // Random integer between min and max (inclusive)
-FUN Int(minv, maxv)
+TASK Int(minv, maxv)
   RETURN RANDOM(minv, maxv)
 
 // Random dice roll (1-6)
-FUN Dice()
+TASK Dice()
   RETURN RANDOM(1, 6)
 
 // Random coin flip
-FUN Coin()
+TASK Coin()
   IF RANDOM(0, 1) == 1
     RETURN "HEADS"
   RETURN "TAILS"
 
 // Random percentage (0-100)
-FUN Percent()
+TASK Percent()
   RETURN RANDOM(0, 100)
