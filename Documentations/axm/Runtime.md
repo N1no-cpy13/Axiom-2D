@@ -50,6 +50,14 @@ Handles:
 - **`BREAK`** → `BreakSignal` → exit loop
 - **`CONTINUE`** → `ContinueSignal` → skip iteration, continue to next
 
+### FOR Loop
+
+`FOR` loop handdles multiple iterable types:
+
+- **Integer**: `FOR i IN 5` → loop `0, 1, 2, 3, 4`
+- **List**: `FOR item IN [1, 2, 3]` → loop `1, 2, 3`
+- **String**: `FOR char IN "Abc"` → loop 'a', 'b', 'c'
+
 ## While Guard
 
 - Max iterations: `MAX_WHILE_ITERATIONS` (default 10000)

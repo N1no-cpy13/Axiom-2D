@@ -10,7 +10,7 @@ Supports:
 - **Variables:** `VAR x = 5`, assignment `x = 5`, index assign `list[0] = 5`
 - **Compound assignment:** `x += 1`, `x -= 1`, `x *= 2`, `x /= 2`
 - **Conditionals:** `IF cond`, `ELIF cond`, `ELSE` (indent-based, no braces)
-- **Loops:** `FOR i IN 5`, `WHILE cond DO` (indent-based)
+- **Loops:** `FOR i IN 5`, `FOR item IN list`, `FOR char IN string`, `WHILE cond DO` (indent-based)
 - **Loop control:** `BREAK`, `CONTINUE`
 - **Functions:** `FUN name(params)`, `RETURN`, default params `b = 0`, type annotation `a: INT`
 - **Entity actions:** `@player MOVE 5 "RIGHT"`, `@enemy DAMAGE 10`, `@player HEAL 10`
@@ -46,6 +46,9 @@ Supports:
 - **`BREAK`**: `Break()`
 - **`CONTINUE`**: `Continue()`
 - **`NULL`**: `Null()`
+- **`FOR ... IN`**: `FOR i IN 5` → `For("i", Number(5), body)`
+- **`FOR ... IN` list**: `FOR item IN [1,2,3]` → `For("item", ListLiteral([...]), body)`
+- **`FOR ... IN` string**: `FOR char IN "abc"` → `For("char", String("abc"), body)`
 
 ## Errors
 

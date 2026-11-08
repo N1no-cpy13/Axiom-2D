@@ -71,6 +71,25 @@ Quick reference for AXM language syntax.
     FOR var IN times
       // code
 
+`times` can be:
+- **Integer**: loop `0` to `times-1`
+- **List**: iterate each item
+- **String**: iterate each character
+
+**Examples**:
+
+    FOR i IN 5
+      SAYF "i = {i}"           // 0, 1, 2, 3, 4
+
+    FOR item IN ["a", "b", "c"]
+      SAYF "item = {item}"     // a, b, c
+
+    FOR char IN "abc"
+      SAYF "char = {char}"     // a, b, c
+
+**Notes**:
+- `BREAK` and `CONTINUE` work inside `FOR` loop
+
 ### BREAK
 
     BREAK
