@@ -1,0 +1,136 @@
+// dictionary.axm - Test suite for DICT features
+// Place in: Documentations/testsuite/dictionary.axm
+
+SAY "=== DICT TEST SUITE ==="
+SAY ""
+
+// 1. Create dict
+SAY "--- 1. Create Dict ---"
+VAR player = {"name": "Bro", "health": 100, "level": 5}
+SAYF "player: {player}"
+
+// 2. Dot access
+SAY "--- 2. Dot Access ---"
+SAYF "name: {player.name}"
+SAYF "health: {player.health}"
+SAYF "level: {player.level}"
+
+// 3. Bracket access
+SAY "--- 3. Bracket Access ---"
+SAYF "name: {player['name']}"
+SAYF "health: {player['health']}"
+
+// 4. Update via dot
+SAY "--- 4. Update Dot ---"
+player.health = 90
+SAYF "health after update: {player.health}"
+
+// 5. Update via bracket
+SAY "--- 5. Update Bracket ---"
+player['health'] = 80
+SAYF "health after bracket update: {player.health}"
+
+// 6. New key
+SAY "--- 6. New Key ---"
+player.gold = 50
+player['exp'] = 1000
+SAYF "gold: {player.gold}"
+SAYF "exp: {player.exp}"
+
+// 7. Nested dict
+SAY "--- 7. Nested Dict ---"
+VAR config = {
+  "player": {"name": "Bro", "health": 100},
+  "world": {"name": "Earth", "size": 1000},
+  "version": "1.0"
+}
+SAYF "config.player.name: {config.player.name}"
+SAYF "config.world.name: {config.world.name}"
+
+// 8. Dict in list
+SAY "--- 8. Dict in List ---"
+VAR enemies = [
+  {"name": "Goblin", "hp": 30},
+  {"name": "Orc", "hp": 50},
+  {"name": "Dragon", "hp": 100}
+]
+FOR enemy IN enemies
+  SAYF "Enemy: {enemy.name}, HP: {enemy.hp}"
+
+// 9. List in dict
+SAY "--- 9. List in Dict ---"
+VAR data = {"items": [1, 2, 3], "count": 3}
+SAYF "items: {data.items}"
+SAYF "count: {data.count}"
+
+// 10. Chained access
+SAY "--- 10. Chained Access ---"
+VAR deep = {"a": {"b": {"c": 42}}}
+SAYF "deep.a.b.c: {deep.a.b.c}"
+
+// 11. Dict functions
+SAY "--- 11. Dict Functions ---"
+VAR d = {"x": 1, "y": 2}
+
+SAYF "HAS_KEY x: {HAS_KEY(d, 'x')}"       // TRUE
+SAYF "HAS_KEY z: {HAS_KEY(d, 'z')}"       // FALSE
+
+SAYF "GET_KEY x: {GET_KEY(d, 'x')}"       // 1
+SAYF "GET_KEY z default: {GET_KEY(d, 'z', 0)}"  // 0
+
+SET_KEY(d, "z", 3)
+SAYF "after SET_KEY z: {d.z}"             // 3
+
+DELETE_KEY(d, "y")
+SAYF "after DELETE_KEY y: HAS_KEY y = {HAS_KEY(d, 'y')}"  // FALSE
+
+SAYF "KEYS: {KEYS(d)}"                    // ['x', 'z']
+SAYF "VALUES: {VALUES(d)}"                // [1, 3]
+
+VAR d2 = {"a": 10, "b": 20}
+VAR merged = MERGE(d, d2)
+SAYF "merged: {merged}"
+
+CLEAR(d2)
+SAYF "d2 after clear: {d2}"               // {}
+
+// 12. Loop over keys
+SAY "--- 12. Loop Keys ---"
+VAR scores = {"Alice": 100, "Bob": 85, "Charlie": 92}
+VAR keys = KEYS(scores)
+FOR k IN keys
+  SAYF "{k}: {scores[k]}"
+
+// 13. Loop over values
+SAY "--- 13. Loop Values ---"
+VAR vals = VALUES(scores)
+FOR v IN vals
+  SAYF "value: {v}"
+
+// 14. Dict with mixed types
+SAY "--- 14. Mixed Types ---"
+VAR mixed = {
+  "string": "hello",
+  "int": 42,
+  "float": 3.14,
+  "bool": TRUE,
+  "null": NULL,
+  "list": [1, 2, 3],
+  "dict": {"nested": "yes"}
+}
+SAYF "string: {mixed.string}"
+SAYF "int: {mixed.int}"
+SAYF "bool: {mixed.bool}"
+SAYF "null: {mixed.null}"
+SAYF "list: {mixed.list}"
+SAYF "dict.nested: {mixed.dict.nested}"
+
+// 15. Empty dict
+SAY "--- 15. Empty Dict ---"
+VAR empty = {}
+SAYF "empty: {empty}"
+empty.first = "value"
+SAYF "after add: {empty.first}"
+
+SAY ""
+SAY "=== DICT TEST SUITE DONE ==="
