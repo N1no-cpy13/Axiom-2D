@@ -2,12 +2,14 @@
 
 from .Entity import Entity
 
+
 class World:
     def __init__(self, name="UnnamedWorld"):
         self.world_name = name
         self.entities = {}
         self.entity_names = {}
-        self.bounds = None 
+        self.bounds = None
+        self.debug = False
     
     def add_entity(self, name, role, health, x, y, z=0):
         if name in self.entity_names:
@@ -43,6 +45,51 @@ class World:
     
     def get_entities(self):
         return list(self.entities.values())
+    
+    # NEW: get entities by role
+    def get_entities_by_role(self, role):
+        return [e for e in self.entities.values() if e.role == role]
+    
+    # NEW: find entities by tag
+    def find_by_tag(self, tag):
+        return [e for e in self.entities.values() if tag in e.tags]
+    
+    # NEW: get entities in radius
+    def get_entities_in_radius(self, x, y, r):
+        result = []
+        r2 = r * r
+        for e in self.entities.values():
+            dx = e.x - x
+            dy = e.y - y
+            if dx*dx + dy*dy <= r2:
+                result.append(e)
+        return result
+    
+    # NEW: get nearest entity
+    def get_nearest_entity(self, x, y):
+        best = None
+        best_dist = float("inf")
+        for e in self.entities.values():
+            dx = e.x - x
+            dy = e.y - y
+            d = dx*dx + dy*dy
+            if d < best_dist:
+                best_dist = d
+                best = e
+        return best
+    
+    # NEW: count by role
+    def count_by_role(self, role):
+        return sum(1 for e in self.entities.values() if e.role == role)
+    
+    # NEW: clear all entities
+    def clear_entities(self):
+        self.entities.clear()
+        self.entity_names.clear()
+    
+    # NEW: get world size (number of entities)
+    def size(self):
+        return len(self.entities)
     
     # game tick 
     def tick(self):
@@ -87,15 +134,14 @@ class World:
         moved = 0
         
         for s in range(steps):
-            next_x = ex+step_x
-            next_y = ey+step_y
-            next_z = ez+step_z
+            next_x = ex + step_x
+            next_y = ey + step_y
+            next_z = ez + step_z
             target = (next_x, next_y, next_z)
             
             # Check bounds 
             if self.bounds is not None and not self._in_bounds(target):
-                blocked = True 
-                blocker = None # blocked by bounds, not entity 
+                blocker = None
                 break 
             
             # Check collision 
@@ -117,7 +163,9 @@ class World:
         
         # Apply final position         
         if moved > 0:
-            entity._position = [ex,ey,ez]
+            entity._position = [ex, ey, ez]
         
-        return moved > 0, blocker 
-        
+        return moved > 0, blocker
+    
+    def __repr__(self):
+        return f"World(name='{self.world_name}', entities={len(self.entities)}, bounds={self.bounds})"
