@@ -1,0 +1,127 @@
+// colorama.axc - ANSI color utilities for CMD/terminal
+// Usage: IMPORT "axm/modules/colorama.axc"
+//        colorama.Print("[red]Hello[/red] [green]World[/green]")
+
+// DONT REMOVE THIS!
+ENABLE_ANSI()
+
+VAR __VERSION__ = "1.0"
+VAR __AUTHOR__ = "AXIOM TEAM"
+
+VAR ESC = "\x1b"
+
+VAR COLOR_CODES = {
+  "reset": "0",
+  "bold": "1",
+  "dim": "2",
+  "italic": "3",
+  "underline": "4",
+  "blink": "5",
+  "reverse": "7",
+  "hidden": "8",
+  "strikethrough": "9",
+  "black": "30",
+  "red": "31",
+  "green": "32",
+  "yellow": "33",
+  "blue": "34",
+  "magenta": "35",
+  "cyan": "36",
+  "white": "37",
+  "bright_black": "90",
+  "bright_red": "91",
+  "bright_green": "92",
+  "bright_yellow": "93",
+  "bright_blue": "94",
+  "bright_magenta": "95",
+  "bright_cyan": "96",
+  "bright_white": "97",
+  "bg_black": "40",
+  "bg_red": "41",
+  "bg_green": "42",
+  "bg_yellow": "43",
+  "bg_blue": "44",
+  "bg_magenta": "45",
+  "bg_cyan": "46",
+  "bg_white": "47"
+}
+
+TASK AnsiCode(name)
+  IF HAS_KEY(COLOR_CODES, name)
+    RETURN ESC + "[" + COLOR_CODES[name] + "m"
+  RETURN ""
+
+TASK ParseColor(text)
+  VAR result = ""
+  VAR i = 0
+  VAR len_text = LEN(text)
+  
+  WHILE i < len_text DO
+    VAR c = text[i]
+    
+    IF c == "["
+      VAR j = i + 1
+      VAR tag = ""
+      VAR found = FALSE
+      WHILE j < len_text DO
+        IF text[j] == "]"
+          found = TRUE
+          BREAK
+        tag = tag + text[j]
+        j = j + 1
+      
+      IF found
+        IF LEN(tag) > 0
+          IF tag[0] == "/"
+            result = result + AnsiCode("reset")
+            i = j + 1
+            CONTINUE
+        
+        VAR code = AnsiCode(tag)
+        IF LEN(code) > 0
+          result = result + code
+          i = j + 1
+          CONTINUE
+      
+      result = result + c
+      i = i + 1
+    ELSE
+      result = result + c
+      i = i + 1
+  
+  RETURN result
+
+TASK Print(text)
+  SAY ParseColor(text)
+
+TASK PrintLine(text)
+  SAY ParseColor(text)
+
+TASK Color(text, color_name)
+  RETURN AnsiCode(color_name) + text + AnsiCode("reset")
+
+TASK StripColor(text)
+  VAR result = ""
+  VAR i = 0
+  VAR len_text = LEN(text)
+  
+  WHILE i < len_text DO
+    VAR c = text[i]
+    
+    IF c == "["
+      VAR j = i + 1
+      VAR found = FALSE
+      WHILE j < len_text DO
+        IF text[j] == "]"
+          found = TRUE
+          BREAK
+        j = j + 1
+      
+      IF found
+        i = j + 1
+        CONTINUE
+    
+    result = result + c
+    i = i + 1
+  
+  RETURN result

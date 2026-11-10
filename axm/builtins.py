@@ -43,7 +43,7 @@ class Builtins:
     # OUTPUT
     # =========================
     def SAY(self, text):
-        print(f"[AXIOM] {text}")
+        print(f"[AXIOM] {self._unescape(str(text))}")
 
     # SAYF
     def SAYF(self, text):
@@ -113,7 +113,92 @@ class Builtins:
         # Optional: if you want to have max health 
         # if hasattr(entity, 'max_health'):
         #     entity.health = min(entity.health, entity.max_health)
+   
+   
+   
+    # SPECIALS FUNCTION 
+    def ENABLE_ANSI(self):
+        """
+        Enable ANSI escape sequences on Windows terminal.
+        Returns True on success.
+        """
+        import os
+        import sys
+        
+        if os.name == 'nt':
+            # Windows 10+ supports ANSI via virtual terminal processing
+            try:
+                import ctypes
+                kernel32 = ctypes.windll.kernel32
+                # Enable ENABLE_VIRTUAL_TERMINAL_PROCESSING (0x0004) on stdout handle
+                handle = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
+                mode = ctypes.c_uint32()
+                if kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
+                    kernel32.SetConsoleMode(handle, mode.value | 0x0004)
+            except Exception:
+                pass
+        
+        # Ensure stdout uses UTF-8 (Python 3.7+)
+        try:
+            sys.stdout.reconfigure(encoding='utf-8')
+        except Exception:
+            pass
+        
+        return True
     
+    def _unescape(self, text):
+        """
+        Process common escape sequences in a string.
+        Supports: \\n, \\t, \\r, \\\\, \\", \\', \\xHH (hex), \\uHHHH (unicode)
+        """
+        result = []
+        i = 0
+        n = len(text)
+        while i < n:
+            ch = text[i]
+            if ch == '\\' and i + 1 < n:
+                nxt = text[i + 1]
+                if nxt == 'n':
+                    result.append('\n')
+                    i += 2
+                elif nxt == 't':
+                    result.append('\t')
+                    i += 2
+                elif nxt == 'r':
+                    result.append('\r')
+                    i += 2
+                elif nxt == '\\':
+                    result.append('\\')
+                    i += 2
+                elif nxt == '"':
+                    result.append('"')
+                    i += 2
+                elif nxt == "'":
+                    result.append("'")
+                    i += 2
+                elif nxt == 'x' and i + 3 < n:
+                    try:
+                        code = int(text[i+2:i+4], 16)
+                        result.append(chr(code))
+                        i += 4
+                    except ValueError:
+                        result.append(ch)
+                        i += 1
+                elif nxt == 'u' and i + 5 < n:
+                    try:
+                        code = int(text[i+2:i+6], 16)
+                        result.append(chr(code))
+                        i += 6
+                    except ValueError:
+                        result.append(ch)
+                        i += 1
+                else:
+                    result.append(ch)
+                    i += 1
+            else:
+                result.append(ch)
+                i += 1
+        return ''.join(result)
     
     # LISTS OPERATIONS 
     def LEN(self, obj):
