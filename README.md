@@ -2,7 +2,7 @@
 # Axiom-2D
 # Tick-Based Game Engine
 
-![Version](https://img.shields.io/badge/version-0.4.0--alpha-blue)
+![Version](https://img.shields.io/badge/version-0.5.0--alpha-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Python](https://img.shields.io/badge/python-3.8%2B-yellow)
 
@@ -19,6 +19,7 @@
 - **Entity System** - Health, position, velocity, collision
 - **AXM Scripting Language** - Custom syntax with lexer, parser, runtime
 - **AXC Module System** - Import `.axc` modules, namespaces, nested imports
+- **Dict & List** - `{"key": value}`, `[1, 2, 3]`, nested, chained
 - **Deprecation System** - Warn user about old syntax (configurable)
 - **JSON Configuration** - Easy world setup
 - **No Dependencies** - Pure Python standard library
@@ -98,6 +99,45 @@ SAYF "1 + 2 = {utils.Add(1, 2)}"
 - Scope: only global variables & functions exported
 - Nested import: modules can import other modules
 - Circular check: prevents circular imports
+
+---
+
+## Dict & List
+
+**Dict** — key-value storage:
+
+```axm
+VAR player = {"name": "Bro", "health": 100, "level": 5}
+
+SAYF "{player.name}"           // Bro
+SAYF "{player['health']}"      // 100
+player.health = 90
+player['gold'] = 50
+
+// Nested
+VAR config = {"player": {"name": "Bro"}}
+SAYF "{config.player.name}"    // Bro
+
+// Dict functions
+HAS_KEY(player, "gold")        // TRUE
+GET_KEY(player, "exp", 0)      // 0
+SET_KEY(player, "atk", 15)
+DELETE_KEY(player, "level")
+KEYS(player)                   // ['name', 'health', 'gold', 'atk']
+VALUES(player)                 // ['Bro', 90, 50, 15]
+MERGE(dict1, dict2)
+CLEAR(dict)
+```
+
+**List** — ordered collection:
+
+```axm
+VAR items = [1, 2, 3, 4, 5]
+SAYF "{items[0]}"              // 1
+SAYF "{LEN(items)}"            // 5
+APPEND(items, 6)
+SAYF "{items}"                 // [1, 2, 3, 4, 5, 6]
+```
 
 ---
 
@@ -238,57 +278,16 @@ Edit `GAME_CONFIG.json`:
 
 ---
 
-## 🐛 Recent Changes (v0.4.0-alpha)
+## 🐛 Recent Changes (v0.5.0-alpha)
 
 ### 🚀 New Features
 
-- **`TASK` keyword**: replaces `FUN` (function keyword)
-- **Deprecation system**: `FUN` deprecated, warns user, still works
-- **`DEPRECATION_MODE`**: `warn`/`error`/`ignore`
-- **`CONTINUE`**: skip iteration in `FOR`/`WHILE`
-- **`FOR ... IN`**: iterate list/string (in addition to int)
-- **Module system** (`.axc`): `IMPORT`, namespace, nested import, circular check
-- **`NULL` keyword**: falsy value, list support, module export
-- **Compound assignment**: `+=`, `-=`, `*=`, `/=`
-- **Method call**: `@player.damage(10)`, `obj.method(args)`
-- **Example modules**: math, string, array, random, vector, color, validation
-
-### ⚠️ Breaking Changes
-
-- `FUN` → **deprecated**, use `TASK` (warning, but still works)
-- `SLEEP 5 S` → **error**, use `SLEEP 5 SEC`
-- `SLEEP 1 MIN` → **error**, use `SLEEP 1 MINUTE`
-- `VAR` in function/IF/WHILE/FOR → **local**, no longer leaks to global
-- `MOVE` no longer returns value (statement, not expression)
+- **`DICT`**: `{"key": value}`, dot/bracket access, nested, chained
+- **8 dict functions**: `HAS_KEY`, `GET_KEY`, `SET_KEY`, `DELETE_KEY`, `KEYS`, `VALUES`, `MERGE`, `CLEAR`
 
 ### 🐛 Bug Fixes
 
-- **Scope:** `VAR` local in function/IF/WHILE/FOR, no global leak
-- **While guard:** Max **10000** iterations (configurable), prevent infinite loop
-- **Direction:** `NORTH/SOUTH/EAST/WEST/ARROW_*/UP_Z/DOWN_Z` support without quotes
-- **TIME_UNITS:** `MIN` → `MINUTE`, `S` removed (conflict with South direction)
-- **Delta time:** Tick rate consistent (~`WORLD_TICK`), independent of load
-- **World bounds:** Optional via `WORLD_BOUNDS` in config
-- **Attribute chain:** `a.b.c` support
-- **Debug flag:** `[TICK]` print only if `DEBUG: true`
-- **Error handling:** Main loop try/except, clean error message
-- **Builtins:**
-  - `INT/STR/BOOL/LIST/NUM` as functions
-  - `MIN/MAX` `*args`
-  - `SPLIT` simplified (use `str.split()`)
-  - `RANDOM_FLOAT` fix (NameError)
-  - `TAN` fix (was `tanh`)
-  - `HEAL` return health
-- **Parser:**
-  - `TASK` / `FUN` handling (both work)
-  - Unary minus (`-5`, `3 + -2`)
-  - NUMBER break on operators (`1+1` without space)
-  - `Parameter.__repr__` truthy fix
-  - `FunctionCall` default param truthy fix
-  - `Attribute` error message fix
-  - `MethodCall` support (Entity method + module function)
-- **Signals:** Signal non-Exception (marker object)
-- **+10 smaller fixes**
+- `math.axc`: `Power` use `POW()` instead of `**`
 
 ---
 
