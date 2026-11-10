@@ -175,6 +175,54 @@ class Builtins:
         if delimeter is None:
             return t.split()
         return t.split(delimeter)
+   
+    # DICT OPERATIONS 
+    def HAS_KEY(self, d, key):
+        if not isinstance(d, dict):
+            raise RuntimeError(f"HAS_KEY: expected dict, got {type(d).__name__}")
+        return key in d
+    
+    def GET_KEY(self, d, key, default=None):
+        if not isinstance(d, dict):
+            raise RuntimeError(f"GET_KEY: expected dict, got {type(d).__name__}")
+        return d.get(key, default)
+
+    def SET_KEY(self, d, key, value):
+        if not isinstance(d, dict):
+            raise RuntimeError(f"SET_KEY: expected dict, got {type(d).__name__}")
+        d[key] = value
+        return d
+
+    def DELETE_KEY(self, d, key):
+        if not isinstance(d, dict):
+            raise RuntimeError(f"DELETE_KEY: expected dict, got {type(d).__name__}")
+        if key in d:
+            del d[key]
+            return True
+        return False
+
+    def KEYS(self, d):
+        if not isinstance(d, dict):
+            raise RuntimeError(f"KEYS: expected dict, got {type(d).__name__}")
+        return list(d.keys())
+
+    def VALUES(self, d):
+        if not isinstance(d, dict):
+            raise RuntimeError(f"VALUES: expected dict, got {type(d).__name__}")
+        return list(d.values())
+
+    def MERGE(self, d1, d2):
+        if not isinstance(d1, dict) or not isinstance(d2, dict):
+            raise RuntimeError(f"MERGE: expected dicts, got {type(d1).__name__}, {type(d2).__name__}")
+        result = d1.copy()
+        result.update(d2)
+        return result
+
+    def CLEAR(self, d):
+        if not isinstance(d, dict):
+            raise RuntimeError(f"CLEAR: expected dict, got {type(d).__name__}")
+        d.clear()
+        return d
         
     # STRING METHODS 
     def UPPER(self, s):
