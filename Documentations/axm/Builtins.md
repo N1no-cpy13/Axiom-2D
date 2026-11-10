@@ -24,6 +24,10 @@ Built-in functions available in AXM scripts.
 ## String Operations
 
 - `SPLIT(string, delimiter=None)` - Split string into list (uses str.split())
+- `UPPER(string)` - Convert to uppercase
+- `LOWER(string)` - Convert to lowercase
+- `TRIM(string)` - Remove leading/trailing whitespace
+- `REPLACE(string, old, new)` - Replace all occurrences of `old` with `new`
 
 ## Type Conversion
 
