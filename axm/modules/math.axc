@@ -17,7 +17,7 @@ TASK Cube(x)
   RETURN x * x * x
 
 TASK Power(base, exp)
-  RETURN base ** exp
+  RETURN POW(base, exp)
 
 TASK Sqrt(x)
   IF x < 0
