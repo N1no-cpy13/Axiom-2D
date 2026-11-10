@@ -2,7 +2,7 @@
 # Axiom-2D
 # Tick-Based Game Engine
 
-![Version](https://img.shields.io/badge/version-0.5.0--alpha-blue)
+![Version](https://img.shields.io/badge/version-0.6.0--alpha-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Python](https://img.shields.io/badge/python-3.8%2B-yellow)
 
@@ -16,11 +16,13 @@
 
 - **3D World Space** (x, y, z coordinates) with 2D gameplay
 - **Tick-based Loop** - Configurable interval (default 0.01s)
-- **Entity System** - Health, position, velocity, collision
+- **Entity System** - Health, position, velocity, collision, tags, teleport, heal
+- **World Queries** - Find by role, tag, radius, nearest
 - **AXM Scripting Language** - Custom syntax with lexer, parser, runtime
 - **AXC Module System** - Import `.axc` modules, namespaces, nested imports
 - **Dict & List** - `{"key": value}`, `[1, 2, 3]`, nested, chained
 - **Deprecation System** - Warn user about old syntax (configurable)
+- **ANSI Color Support** - `colorama.axc` module with `ENABLE_ANSI()`
 - **JSON Configuration** - Easy world setup
 - **No Dependencies** - Pure Python standard library
 
@@ -141,6 +143,17 @@ SAYF "{items}"                 // [1, 2, 3, 4, 5, 6]
 
 ---
 
+## String Methods
+
+```axm
+UPPER("hello")                 // HELLO
+LOWER("WORLD")                 // world
+TRIM("  hi  ")                 // "hi"
+REPLACE("a-b-c", "-", "_")     // "a_b_c"
+```
+
+---
+
 ## Deprecation System
 
 Deprecated syntax still works, but warns user.
@@ -175,6 +188,27 @@ TASK add(a, b)
 
 ---
 
+## ANSI Color Support
+
+Use `colorama.axc` module to print colored text in terminal.
+
+```axm
+ENABLE_ANSI()  // required on Windows
+IMPORT "axm/modules/colorama.axc"
+
+colorama.Print("[red]Hello[/red] [green]World[/green]")
+```
+
+**Functions**:
+
+- `colorama.Print(text)` — parse `[color]...[/color]` tags and print
+- `colorama.Color(text, color_name)` — colorize single text
+- `colorama.StripColor(text)` — remove color tags
+
+**Available colors**: `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `bright_*`, `bg_*`, `bold`, `underline`, dll.
+
+---
+
 ## Example Modules
 
 ```
@@ -185,7 +219,8 @@ axm/modules/
 ├── random.axc        — Random utilities (Bool, Choice, Shuffle, Dice, dll)
 ├── vector.axc        — Vector math (Add, Dot, Distance, Rotate2D, dll)
 ├── color.axc         — Color utilities (RGB, Mix, Lighten, Invert, ToHex, dll)
-└── validation.axc    — Validation (IsEmpty, IsNumeric, IsEmail, dll)
+├── validation.axc    — Validation (IsEmpty, IsNumeric, IsEmail, dll)
+└── colorama.axc      — ANSI color for terminal
 ```
 
 **Usage**:
@@ -230,6 +265,7 @@ Documentations/
     ├── if_else.axm
     ├── lists.axm
     └── while.axm
+    └── dictionary.axm
 ```
 
 ---
@@ -278,16 +314,26 @@ Edit `GAME_CONFIG.json`:
 
 ---
 
-## 🐛 Recent Changes (v0.5.0-alpha)
+## 🐛 Recent Changes (v0.6.0-alpha)
 
 ### 🚀 New Features
 
+- **`TASK`** keyword (replaces `FUN`, which is deprecated)
+- **`CONTINUE`** statement for loops
+- **`FOR ... IN`** now supports list and string iteration
+- **String methods**: `UPPER`, `LOWER`, `TRIM`, `REPLACE`
+- **ANSI color support**: `colorama.axc` module + `ENABLE_ANSI()` builtin
+- **Entity**: `max_health`, `tags`, `heal()`, `teleport()`, `distance_to()`, `clone()`, `to_dict()`
+- **World**: `find_by_tag()`, `get_entities_in_radius()`, `get_nearest_entity()`, `count_by_role()`
 - **`DICT`**: `{"key": value}`, dot/bracket access, nested, chained
 - **8 dict functions**: `HAS_KEY`, `GET_KEY`, `SET_KEY`, `DELETE_KEY`, `KEYS`, `VALUES`, `MERGE`, `CLEAR`
 
 ### 🐛 Bug Fixes
 
 - `math.axc`: `Power` use `POW()` instead of `**`
+- Lexer: `COMMA` missing `continue` caused token skip
+- Parser: dict trailing comma handling
+- Engine: `update()` collision message logic, `try_move()` blocked reset
 
 ---
 
