@@ -1,3 +1,4 @@
+
 # 🌍 World.py
 
 Manages all entities and physics in the game world.
@@ -19,6 +20,13 @@ Manages all entities and physics in the game world.
 - `get_entity(entity_id)` - Find entity by ID
 - `get_entity_by_name(name)` - Find entity by name
 - `get_entities()` - List all entities
+- `get_entities_by_role(role)` - List entities with matching role
+- `find_by_tag(tag)` - List entities with matching tag
+- `get_entities_in_radius(x, y, r)` - List entities within radius
+- `get_nearest_entity(x, y)` - Find nearest entity to position
+- `count_by_role(role)` - Count entities with matching role
+- `clear_entities()` - Remove all entities
+- `size()` - Number of entities
 - `tick()` - Update all entities, process movement, remove dead ones
 - `try_move(entity, dx, dy, dz)` - Attempt movement with collision + bounds check
 - `is_adjacent(e1, e2)` - Check if two entities are next to each other
@@ -36,10 +44,12 @@ Manages all entities and physics in the game world.
 
 Set via `WORLD_BOUNDS` in config:
 
-    "WORLD_BOUNDS": {
-      "min_x": 0, "max_x": 10,
-      "min_y": 0, "max_y": 10
-    }
+```json
+"WORLD_BOUNDS": {
+  "min_x": 0, "max_x": 10,
+  "min_y": 0, "max_y": 10
+}
+```
 
 - If `None` -> infinite world
 - Axis without min/max -> infinite on that axis
@@ -47,12 +57,19 @@ Set via `WORLD_BOUNDS` in config:
 
 ## Example
 
-    world = World("TestWorld")
-    world.debug = True
-    world.bounds = {"min_x": 0, "max_x": 10, "min_y": 0, "max_y": 10}
+```python
+world = World("TestWorld")
+world.debug = True
+world.bounds = {"min_x": 0, "max_x": 10, "min_y": 0, "max_y": 10}
 
-    player = world.add_entity("player", "ENTITY", 100, 0, 0)
-    enemy = world.add_entity("enemy", "ENTITY", 100, 5, 0)
+player = world.add_entity("player", "ENTITY", 100, 0, 0)
+enemy = world.add_entity("enemy", "ENTITY", 100, 5, 0)
 
-    player.vx = 20  # try to move 20 right
-    world.tick()    # player stops at (4, 0) - blocked by enemy at (5, 0)
+player.vx = 20  # try to move 20 right
+world.tick()    # player stops at (4, 0) - blocked by enemy at (5, 0)
+
+# Query
+enemies = world.get_entities_by_role("ENEMY")
+near = world.get_entities_in_radius(5, 5, 10)
+tagged = world.find_by_tag("boss")
+```
