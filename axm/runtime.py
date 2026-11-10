@@ -185,6 +185,12 @@ class Runtime:
             obj = self.eval(expr.obj)
             attr_name = expr.attr
             
+            # Dict attribute access (player.name -> player["name"])
+            if isinstance(obj, dict):
+                if attr_name not in obj:
+                    raise AXMRuntimeError(f"Dict key '{attr_name}' not found")
+                return obj[attr_name]
+            
             # Module handling
             from .module_loader import Module, BoundModuleFunction 
             if isinstance(obj, Module):
@@ -287,9 +293,23 @@ class Runtime:
             
         elif isinstance(expr, ListLiteral):
             return [self.eval(e) for e in expr.elements]
+        elif isinstance(expr, DictLiteral):
+            result = {}
+            for key_expr, value_expr in expr.pairs:
+                key = self.eval(key_expr)
+                value = self.eval(value_expr)
+                result[key] = value 
+            return result
         elif isinstance(expr, IndexAccess):
             target = self.eval(expr.target)
             index = self.eval(expr.index)
+            
+            # Dict indexing (any key type)
+            if isinstance(target, dict):
+                if index not in target:
+                    raise AXMRuntimeError(f"Dict key '{index}' not found")
+                
+                return target[index]
             
             if not isinstance(index, int):
                 raise AXMRuntimeError(f"Index must be integer, got {type(index).__name__}")
@@ -463,10 +483,15 @@ class Runtime:
         elif isinstance(node, Assignment):
             value = self.eval(node.value)
             
-            # Index Assignment 
+            # Index Assignment (list or dict)
             if isinstance(node.name, IndexAccess):
                 target = self.eval(node.name.target)
                 index = self.eval(node.name.index)
+                
+                # Dict assignment (any key type)
+                if isinstance(target, dict):
+                    target[index] = value 
+                    return value
                 
                 if not isinstance(target, list):
                     raise AXMRuntimeError(f"Cannot assign to index of non-list: {type(target).__name__}")
@@ -479,6 +504,26 @@ class Runtime:
                     raise AXMRuntimeError(f"List index {index} out of range (length {len(target)})")
                 
                 return value 
+           
+            # Dict/entity attribute assignment (obj.attr = value)
+            elif isinstance(node.name, Attribute):
+                obj = self.eval(node.name.obj)
+                attr_name = node.name.attr 
+                
+                # Dict attribute assignment
+                if isinstance(obj, dict):
+                    obj[attr_name] = value 
+                    return value 
+                
+                # Entity attribute assignment
+                from engine.Entity import Entity 
+                if isinstance(obj, Entity):
+                    if not hasattr(obj, attr_name):
+                        raise AXMRuntimeError(f"Entity '{obj.name}' has no attribute '{attr_name}'")
+                    setattr(obj, attr_name, value)
+                    return value
+                
+                raise AXMRuntimeError(f"Cannot assign attribute to {type(obj).__name__}")
            
             # Regular assignment 
             elif isinstance(node.name, str):

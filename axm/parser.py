@@ -265,17 +265,55 @@ class Parser:
             
             self.eat("RBRACKET")
             return ListLiteral(elements)
+        elif token.type == "LBRACE":
+            self.eat("LBRACE")
+            pairs = []
+            
+            self.skip_newlines()
+            
+            if self.cur().type != "RBRACE":
+                while True:
+                    # Key: string or expression 
+                    if self.cur().type == "STRING":
+                        key = String(self.cur().value)
+                        self.eat("STRING")
+                    else:
+                        key = self.parse_expression()
+                    
+                    self.eat("COLON")
+                    value = self.parse_expression()
+                    pairs.append((key, value))
+                    
+                    self.skip_newlines()
+                    if self.cur().type == "COMMA":
+                        self.eat("COMMA")
+                        self.skip_newlines()
+                    else:
+                        break
+            
+            self.eat("RBRACE")
+            return DictLiteral(pairs)
         else:
             raise ParserError(f"Unexpected token in expression: {token.type}")
         
     def parse_primary(self):
         expr = self.parse_primary_atom()
         
-        while self.cur().type == "LBRACKET":
-            self.eat("LBRACKET")
-            index = self.parse_expression()
-            self.eat("RBRACKET")
-            expr = IndexAccess(expr, index)
+        while True:
+            if self.cur().type == "LBRACKET":
+                self.eat("LBRACKET")
+                index = self.parse_expression()
+                self.eat("RBRACKET")
+                expr = IndexAccess(expr, index)
+            elif self.cur().type == "DOT":
+                self.eat("DOT")
+                if self.cur().type != "IDENT":
+                    raise ParserError("Expected attribute name after '.'")
+                attr = self.cur().value 
+                self.eat("IDENT")
+                expr = Attribute(expr, attr)
+            else:
+                break
         
         return expr 
 
@@ -348,7 +386,7 @@ class Parser:
     def statement(self):
         t = self.cur()
         
-        if t.type == "FUN":
+        if t.type == "FUN" or t.type == "TASK":
             return self.parse_function_def()
         if t.type == "IMPORT":
             self.eat("IMPORT")
@@ -394,6 +432,18 @@ class Parser:
         if t.type == "IDENT":
             name = t.value 
             next_token = self.tokens[self.pos + 1] if self.pos + 1 < len(self.tokens) else Token("EOF")
+            
+            # attribute assignment
+            if next_token and next_token.type == "DOT":
+                var_expr = self.parse_primary()
+                
+                if self.cur().type == "ASSIGN":
+                    self.eat("ASSIGN")
+                    value = self.parse_expression()
+                    self.skip_newlines()
+                    return Assignment(var_expr, value)
+                else:
+                    return var_expr
             
             # index assignment
             if next_token and next_token.type == "LBRACKET":
@@ -504,7 +554,10 @@ class Parser:
         return While(condition, body)
     
     def parse_function_def(self):
-        self.eat("FUN")
+        if self.cur().type == "TASK":
+            self.eat("TASK")
+        else:
+            self.eat("FUN")
         name = self.cur().value
         self.eat("IDENT")
         self.eat("LPAREN")

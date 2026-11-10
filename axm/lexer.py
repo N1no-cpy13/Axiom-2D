@@ -150,7 +150,21 @@ def lex(code: str):
             if ch == ',':
                 tokens.append(Token("COMMA", ",", line_no))
                 pos += 1
+            if ch == '{':
+                tokens.append(Token("LBRACE", "{", line_no))
+                bracket_lines += 1
+                pos += 1
+                continue 
+            if ch == '}':
+                tokens.append(Token("RBRACE", "}", line_no))
+                bracket_lines -= 1
+                pos += 1
+                continue 
+            if ch == ':':
+                tokens.append(Token("COLON", ":", line_no))
+                pos += 1
                 continue
+                
 
             # OPERATORS
             if line.startswith("+=", pos):

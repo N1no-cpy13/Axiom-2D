@@ -86,6 +86,14 @@ class Assignment(Node):
     def __repr__(self):
         return f"Assignment({self.name} = {self.value})"
 
+class DictAssignment(Node):
+    def __init__(self, target, key, value):
+        self.target = target # Expr (dict)
+        self.key = key # Expr (key)
+        self.value = value # Expr (value)
+    def __repr__(self):
+        return f"DictAssignment({self.target}[{self.key}] = {self.value})"
+
 class ListLiteral(Node):
     def __init__(self, elements):
         self.elements = elements
@@ -223,3 +231,29 @@ class Attribute(Expr):
         self.attr = attr    # string
     def __repr__(self):
         return f"Attribute({self.obj}.{self.attr})"
+
+class ListLiteral(Expr):
+    def __init__(self, elements):
+        self.elements = elements
+    def __repr__(self):
+        return f"List({self.elements})"
+
+class IndexAccess(Expr):
+    def __init__(self, target, index):
+        self.target = target
+        self.index = index
+    def __repr__(self):
+        return f"Index({self.target}[{self.index}])"
+
+class DictLiteral(Expr):
+    def __init__(self, pairs):
+        self.pairs = pairs
+    def __repr__(self):
+        return f"Dict({self.pairs})"
+
+class DictAccess(Expr):
+    def __init__(self, target, key):
+        self.target = target
+        self.key = key
+    def __repr__(self):
+        return f"DictAccess({self.target}[{self.key}])"
