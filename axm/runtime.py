@@ -279,6 +279,11 @@ class Runtime:
                 args = [self.eval(arg) for arg in expr.args]
                 return obj.call(args)
             
+            # bound method (from Attribute eval on Entity)
+            if callable(obj) and not isinstance(obj, type):
+                args = [self.eval(arg) for arg in expr.args]
+                return obj(*args)
+            
             method_name = expr.method 
             args = [self.eval(arg) for arg in expr.args]
             
