@@ -14,8 +14,14 @@ Converts AXM source code into tokens for the parser.
 - **Time units**: `MS` (millisecond), `SEC` (second), `MINUTE` (minute)
 - **Operators**: `+`, `-`, `*`, `/`, `==`, `!=`, `>`, `<`, `>=`, `<=`
 - **Compound operators**: `+=`, `-=`, `*=`, `/=`
-- **Special**: `@` (entity ref), `.` (attr access), `(` `)` `[` `]` `,`, `=` (assign)
+- **Special**: `@` (entity ref), `.` (attr access), `(` `)` `[` `]` `{` `}` `,` `:` `=` (assign)
 - **Control**: `NEWLINE`, `INDENT`, `DEDENT`, `EOF`
+
+### Dict Tokens 
+
+- `{` → `LBRACE`
+- `}` → `RBRACE`
+- `:` → `COLON`
 
 ### Deprecated Keywords 
 

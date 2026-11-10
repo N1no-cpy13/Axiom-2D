@@ -32,6 +32,7 @@ Handles:
 - Logical ops (`AND`, `OR`, `NOT`)
 - Function calls (user + builtins)
 - Lists, indexing
+- Dicts — `DictLiteral`, `DictAccess`, `Attribute` dict
 - Method calls (`@player.damage(10)`, `obj.method(args)`)
 - Module attribute (`utils.version`, `math.PI`)
 - Module function (`utils.Add(1, 2)`, `math.Square(5)`)
@@ -62,6 +63,13 @@ Handles:
 
 - Max iterations: `MAX_WHILE_ITERATIONS` (default 10000)
 - Raises `AXMRuntimeError` if exceeded (prevent infinite loop)
+
+## Dict Handling
+
+- **`eval(DictLiteral)`** → `dict` (Python)
+- **`eval(IndexAccess)`** — if target is dict → `target[key]`
+- **`eval(Attribute)`** — if obj is dict → `obj[attr_name]`
+- **`execute_node(Assignment)`** — if target is dict → `target[key] = value`
 
 ## Sleep (Blocking)
 

@@ -21,6 +21,18 @@ Built-in functions available in AXM scripts.
 - `CONTAINS(list, item)` - Check membership (returns bool)
 - `INDEX_OF(list, item)` - Find index (-1 if not found)
 
+## Dict Operations
+
+- `LEN(dict)` - Number of keys
+- `HAS_KEY(dict, key)` - Check if key exists (returns bool)
+- `GET_KEY(dict, key, default=None)` - Get value (default if not found)
+- `SET_KEY(dict, key, value)` - Set key to value
+- `DELETE_KEY(dict, key)` - Delete key (returns True/False)
+- `KEYS(dict)` - List of keys
+- `VALUES(dict)` - List of values
+- `MERGE(dict1, dict2)` - Merge two dicts (returns new dict)
+- `CLEAR(dict)` - Remove all keys (returns empty dict)
+
 ## String Operations
 
 - `SPLIT(string, delimiter=None)` - Split string into list (uses str.split())

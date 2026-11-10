@@ -25,6 +25,7 @@ Quick reference for AXM language syntax.
 | Boolean | `TRUE`, `FALSE` |
 | Null | `NULL` |
 | List | `[1, 2, 3]` |
+| Dict | `{"key": value}` |
 
 ---
 
@@ -39,6 +40,33 @@ Quick reference for AXM language syntax.
     health -= 5                // health = health - 5
     health *= 2                // health = health * 2
     health /= 2                // health = health / 2
+
+## Dict
+
+    VAR player = {"name": "Bro", "health": 100, "level": 5}
+
+    // Dot access
+    SAYF "{player.name}"           // Bro
+    player.health = 90             // Update
+
+    // Bracket access
+    SAYF "{player['name']}"        // Bro
+    player['health'] = 80          // Update
+
+    // New key
+    player.gold = 50
+
+    // Nested
+    VAR config = {"player": {"name": "Bro"}}
+    SAYF "{config.player.name}"    // Bro
+
+    // Dict functions
+    SAYF "{HAS_KEY(player, 'gold')}"     // TRUE
+    SAYF "{GET_KEY(player, 'exp', 0)}"   // 0
+    SET_KEY(player, "atk", 15)
+    DELETE_KEY(player, "level")
+    SAYF "{KEYS(player)}"                // ['name', 'health', 'gold', 'atk']
+    SAYF "{VALUES(player)}"              // ['Bro', 80, 50, 15]
 
 ---
 
@@ -108,13 +136,16 @@ Quick reference for AXM language syntax.
 
 ### Functions
 
-    FUN name(param1, param2)
+    TASK name(param1, param2)
       RETURN value
 
     name(arg1, arg2)
 
-**Default params**: `FUN add(a, b = 0)`
-**Type annotation**: `FUN greet(name: STR)`
+**Default params**: `TASK add(a, b = 0)`
+**Type annotation**: `TASK greet(name: STR)`
+
+**Note**: `FUN` is deprecated — use `TASK` instead. `FUN` still works, but
+shows a warning (`DEPRECATION_MODE` config).
 
 ### Entity Reference
 

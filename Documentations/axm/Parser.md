@@ -17,6 +17,7 @@ Supports:
 - **Entity actions:** `@player MOVE 5 "RIGHT"`, `@enemy DAMAGE 10`, `@player HEAL 10`
 - **I/O:** `SAY`, `SAYF` (f-strings with `{expr}`)
 - **Lists:** `[1, 2, 3]`, indexing `list[0]`
+- **Dicts:** `{"key": value}`, access `dict.key`, `dict["key"]`, update `dict.key = value`
 - **Attribute chain:** `a.b.c` (nested attribute access)
 - **Entity ref:** `@player.x` (entity attribute)
 - **Method call:** `@player.damage(10)`, `obj.method(args)`
@@ -52,6 +53,11 @@ Supports:
 - **`FOR ... IN` string**: `FOR char IN "abc"` → `For("char", String("abc"), body)`
 - **`TASK`**: `TASK add(a, b)` → `FunctionDef("add", [...], body)`
 - **`FUN`** (deprecated): `FUN add(a, b)` → same, warns user
+- **`{"key": value}`**: `DictLiteral([(String("key"), value)])`
+- **`dict.key`**: `Attribute(Variable("dict"), "key")`
+- **`dict["key"]`**: `IndexAccess(Variable("dict"), String("key"))`
+- **`dict.key = value`**: `Assignment(Attribute(...), value)`
+- **`dict["key"] = value`**: `Assignment(IndexAccess(...), value)`
 
 ## Errors
 
