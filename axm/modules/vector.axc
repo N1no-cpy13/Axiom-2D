@@ -1,79 +1,162 @@
-// vector.axc - Vector math module (2D/3D)
+// vector.axc - Vector math module (2D/3D) with classes
 // Usage: IMPORT "axm/modules/vector.axc"
-// Vectors are lists: [x, y] or [x, y, z]
 
-VAR __VERSION__ = "1.1"
+VAR __VERSION__ = "2.0"
 VAR __AUTHOR__ = "AXIOM TEAM"
 
-// Add two vectors (same dimension)
+// ============================================
+// CLASS Vec2
+// ============================================
+CLASS Vec2
+  VAR x = 0
+  VAR y = 0
+  
+  TASK __init__(x, y)
+    SELF.x = x
+    SELF.y = y
+  
+  TASK add(other)
+    RETURN NEW Vec2(x + other.x, y + other.y)
+  
+  TASK sub(other)
+    RETURN NEW Vec2(x - other.x, y - other.y)
+  
+  TASK scale(s)
+    RETURN NEW Vec2(x * s, y * s)
+  
+  TASK dot(other)
+    RETURN x * other.x + y * other.y
+  
+  TASK length()
+    RETURN SQRT(x * x + y * y)
+  
+  TASK normalize()
+    VAR len = length()
+    IF len == 0
+      RETURN NEW Vec2(0, 0)
+    RETURN NEW Vec2(x / len, y / len)
+  
+  TASK distance(other)
+    VAR dx = x - other.x
+    VAR dy = y - other.y
+    RETURN SQRT(dx * dx + dy * dy)
+  
+  TASK angle()
+    RETURN ATAN2(y, x)
+  
+  TASK rotate(angle)
+    VAR cos_a = COS(angle)
+    VAR sin_a = SIN(angle)
+    RETURN NEW Vec2(x * cos_a - y * sin_a, x * sin_a + y * cos_a)
+  
+  TASK to_string()
+    RETURN "(" + STR(x) + ", " + STR(y) + ")"
+
+// ============================================
+// CLASS Vec3
+// ============================================
+CLASS Vec3
+  VAR x = 0
+  VAR y = 0
+  VAR z = 0
+  
+  TASK __init__(x, y, z)
+    SELF.x = x
+    SELF.y = y
+    SELF.z = z
+  
+  TASK add(other)
+    RETURN NEW Vec3(x + other.x, y + other.y, z + other.z)
+  
+  TASK sub(other)
+    RETURN NEW Vec3(x - other.x, y - other.y, z - other.z)
+  
+  TASK scale(s)
+    RETURN NEW Vec3(x * s, y * s, z * s)
+  
+  TASK dot(other)
+    RETURN x * other.x + y * other.y + z * other.z
+  
+  TASK cross(other)
+    RETURN NEW Vec3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x)
+  
+  TASK length()
+    RETURN SQRT(x * x + y * y + z * z)
+  
+  TASK normalize()
+    VAR len = length()
+    IF len == 0
+      RETURN NEW Vec3(0, 0, 0)
+    RETURN NEW Vec3(x / len, y / len, z / len)
+  
+  TASK distance(other)
+    VAR dx = x - other.x
+    VAR dy = y - other.y
+    VAR dz = z - other.z
+    RETURN SQRT(dx * dx + dy * dy + dz * dz)
+  
+  TASK to_string()
+    RETURN "(" + STR(x) + ", " + STR(y) + ", " + STR(z) + ")"
+
+// ============================================
+// LEGACY FUNCTIONS (list-based)
+// ============================================
 TASK Add(a, b)
   VAR result = []
   FOR i IN LEN(a)
     APPEND(result, a[i] + b[i])
   RETURN result
 
-// Subtract two vectors
 TASK Sub(a, b)
   VAR result = []
   FOR i IN LEN(a)
     APPEND(result, a[i] - b[i])
   RETURN result
 
-// Multiply vector by scalar
 TASK Scale(v, s)
   VAR result = []
   FOR i IN LEN(v)
     APPEND(result, v[i] * s)
   RETURN result
 
-// Dot product
 TASK Dot(a, b)
   VAR total = 0
   FOR i IN LEN(a)
     total = total + a[i] * b[i]
   RETURN total
 
-// Magnitude/length of vector
 TASK Length(v)
   VAR total = 0
   FOR i IN LEN(v)
     total = total + v[i] * v[i]
   RETURN SQRT(total)
 
-// Normalize vector (length = 1)
 TASK Normalize(v)
   VAR len = Length(v)
   IF len == 0
     RETURN NULL
   RETURN Scale(v, 1 / len)
 
-// Distance between two points
 TASK Distance(a, b)
   RETURN Length(Sub(a, b))
 
-// 2D distance (shortcut)
 TASK Distance2D(x1, y1, x2, y2)
   VAR dx = x2 - x1
   VAR dy = y2 - y1
   RETURN SQRT(dx * dx + dy * dy)
 
-// 3D distance (shortcut)
 TASK Distance3D(x1, y1, z1, x2, y2, z2)
   VAR dx = x2 - x1
   VAR dy = y2 - y1
   VAR dz = z2 - z1
   RETURN SQRT(dx * dx + dy * dy + dz * dz)
 
-// Linear interpolation between two vectors
 TASK Lerp(a, b, t)
   VAR result = []
   FOR i IN LEN(a)
     APPEND(result, a[i] + (b[i] - a[i]) * t)
   RETURN result
 
-// === GRAPHICS TASKCTIONS ===
-
-// Rotate 2D vector around origin by angle (radians)
 TASK Rotate2D(v, angle)
   VAR cos_a = COS(angle)
   VAR sin_a = SIN(angle)
@@ -83,7 +166,6 @@ TASK Rotate2D(v, angle)
   VAR new_y = x * sin_a + y * cos_a
   RETURN [new_x, new_y]
 
-// Rotate 2D vector around pivot point
 TASK RotateAround(v, pivot, angle)
   VAR dx = v[0] - pivot[0]
   VAR dy = v[1] - pivot[1]
@@ -93,27 +175,21 @@ TASK RotateAround(v, pivot, angle)
   VAR new_y = dx * sin_a + dy * cos_a + pivot[1]
   RETURN [new_x, new_y]
 
-// Reflect vector across X axis
 TASK ReflectX(v)
   RETURN [v[0], -v[1]]
 
-// Reflect vector across Y axis
 TASK ReflectY(v)
   RETURN [-v[0], v[1]]
 
-// Reflect vector across origin
 TASK ReflectOrigin(v)
   RETURN [-v[0], -v[1]]
 
-// Perpendicular vector (2D) — rotate 90 degrees
 TASK Perpendicular(v)
   RETURN [-v[1], v[0]]
 
-// Angle of 2D vector (radians)
 TASK Angle(v)
   RETURN ATAN2(v[1], v[0])
 
-// Angle between two 2D vectors (radians)
 TASK AngleBetween(a, b)
   VAR dot = Dot(a, b)
   VAR len_a = Length(a)
@@ -121,14 +197,12 @@ TASK AngleBetween(a, b)
   IF len_a == 0 OR len_b == 0
     RETURN 0
   VAR cos_angle = dot / (len_a * len_b)
-  // Clamp to [-1, 1] to avoid domain error
   IF cos_angle < -1
     cos_angle = -1
   IF cos_angle > 1
     cos_angle = 1
   RETURN ACOS(cos_angle)
 
-// Cross product (3D) — returns vector perpendicular to both
 TASK Cross(a, b)
   VAR ax = a[0]
   VAR ay = a[1]
@@ -141,7 +215,6 @@ TASK Cross(a, b)
   VAR cz = ax * by - ay * bx
   RETURN [cx, cy, cz]
 
-// Project vector a onto vector b
 TASK Project(a, b)
   VAR dot_ab = Dot(a, b)
   VAR dot_bb = Dot(b, b)
@@ -149,7 +222,6 @@ TASK Project(a, b)
     RETURN NULL
   RETURN Scale(b, dot_ab / dot_bb)
 
-// Clamp vector components between min and max
 TASK ClampVec(v, minv, maxv)
   VAR result = []
   FOR i IN LEN(v)
@@ -161,7 +233,6 @@ TASK ClampVec(v, minv, maxv)
     APPEND(result, val)
   RETURN result
 
-// Vector to string (debug)
 TASK ToString(v)
   VAR result = "("
   FOR i IN LEN(v)
