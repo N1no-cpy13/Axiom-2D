@@ -58,6 +58,12 @@ Supports:
 - **`dict["key"]`**: `IndexAccess(Variable("dict"), String("key"))`
 - **`dict.key = value`**: `Assignment(Attribute(...), value)`
 - **`dict["key"] = value`**: `Assignment(IndexAccess(...), value)`
+- **`CLASS`**: `CLASS Vec2 ...` → `ClassDef("Vec2", parent=None, body=[...])`
+- **`CLASS ... EXTENDS ...`**: `CLASS Player EXTENDS Entity` → `ClassDef("Player", parent="Entity", body=[...])`
+- **`NEW`**: `NEW Vec2(3, 4)` → `NewExpr("Vec2", [Number(3), Number(4)])`
+- **`NEW module.Class`**: `NEW vector.Vec2(3, 4)` → `NewExpr(Attribute(Variable("vector"), "Vec2"), [...])`
+- **`SELF`**: `SELF.name` → `Attribute(SelfExpr(), "name")`
+- **`SUPER()`**: `SUPER().__init__(...)` → `MethodCall(Attribute(SuperExpr(), "__init__"), "__init__", [...])`
 
 ## Errors
 

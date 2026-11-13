@@ -70,6 +70,71 @@ Quick reference for AXM language syntax.
 
 ---
 
+## Class
+
+### Declaration
+
+    CLASS Player
+      VAR name = "Bro"
+      VAR health = 100
+      
+      TASK __init__(name, health)
+        SELF.name = name
+        SELF.health = health
+      
+      TASK damage(amount)
+        health = health - amount
+        RETURN health
+
+### Instantiation
+
+    VAR p = NEW Player("Bro", 100)
+
+### Access Attribute
+
+    SAYF "name: {p.name}"
+    p.health = 90
+
+### Method Call
+
+    p.damage(10)
+
+### Inheritance
+
+    CLASS Entity
+      VAR name = "Entity"
+      VAR health = 100
+      
+      TASK __init__(name, health)
+        SELF.name = name
+        SELF.health = health
+      
+      TASK info()
+        RETURN "Entity: " + name
+
+    CLASS Player EXTENDS Entity
+      VAR level = 1
+      
+      TASK __init__(name, health, level)
+        SUPER().__init__(name, health)
+        SELF.level = level
+      
+      TASK info()
+        RETURN "Player: " + name + " Lv." + STR(level)
+
+### SUPER
+
+- `SUPER().__init__(...)` — call parent constructor
+- `SUPER().method()` — call parent method
+
+### SELF
+
+- `SELF.attr` — access instance attribute
+- `SELF.method()` — call instance method
+- `attr` (without SELF) — resolve local → SELF → global
+
+---
+
 ## Operators
 
 | Arithmetic | Comparison | Logical |

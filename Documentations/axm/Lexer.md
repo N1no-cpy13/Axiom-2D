@@ -6,7 +6,7 @@ Converts AXM source code into tokens for the parser.
 
 ## Token Types
 
-- **Keywords**: `SAY`, `SAYF`, `IF`, `ELSE`, `ELIF`, `FOR`, `WHILE`, `DO`, `BREAK`, `CONTINUE`, `TASK`, `RETURN`, `VAR`, `MOVE`, `DAMAGE`, `HEAL`, `SLEEP`, `IN`, `NOT`, `AND`, `OR`, `TRUE`, `FALSE`, `STR`, `INT`, `LIST`, `BOOL`, `NUM`, `IMPORT`, `NULL`
+- **Keywords**: `SAY`, `SAYF`, `IF`, `ELSE`, `ELIF`, `FOR`, `WHILE`, `DO`, `BREAK`, `CONTINUE`, `TASK`, `RETURN`, `VAR`, `MOVE`, `DAMAGE`, `HEAL`, `SLEEP`, `IN`, `NOT`, `AND`, `OR`, `TRUE`, `FALSE`, `STR`, `INT`, `LIST`, `BOOL`, `NUM`, `IMPORT`, `NULL`, `CLASS`, `NEW`, `SELF`, `SUPER`, `EXTENDS`
 - **Deprecated keywords**: `FUN` (use `TASK` instead)
 - **Identifiers**: Variable/function names (letters, digits, underscore)
 - **Literals**: Numbers (int/float), strings (`"..."` or `'...'`), booleans (`TRUE`/`FALSE`), null (`NULL`)

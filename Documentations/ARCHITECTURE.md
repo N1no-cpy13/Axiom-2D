@@ -40,7 +40,7 @@
 * **runtime.py:** Executes AST, manages scope, calls builtins, handles modules
 * **builtins.py:** Built-in functions (SAY, MOVE, DAMAGE, LEN, INT, STR, BOOL, LIST, NUM, MIN, MAX, SPLIT, etc.)
 * **signals.py:** Control flow signals (Return, Break) — marker objects, not exceptions
-* **module_loader.py:** Loads `.axc` modules, handles nested import, circular check, namespaces
+* **module_loader.py:** Loads `.axc` modules, handles nested import, circular check, namespaces (globals, functions, classes)
 
 ---
 
@@ -122,5 +122,6 @@ Optional via `WORLD_BOUNDS` in `GAME_CONFIG.json`:
 - **String**: interpolation `SAYF "{x}"`, `'...'` or `"..."` quote
 - **NULL**: `NULL` keyword (falsy)
 - **Module**: `IMPORT "module.axc"`
+- **Class**: `CLASS Name`, `EXTENDS`, `NEW`, `SELF`, `SUPER()`, inheritance, override
 
 ---

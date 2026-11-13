@@ -50,6 +50,7 @@ Module object — has `globals` & `functions`.
 - `name` — Module name (from file name)
 - `globals` — Dict `{var_name: value}`
 - `functions` — Dict `{func_name: FunctionDef}`
+- `classes` — Dict `{class_name: ClassDef}`
 
 **Methods**:
 
@@ -122,6 +123,11 @@ Bound function — callable from module context.
     obj = self.eval(Attribute(Variable("math"), "Add"))  # → BoundModuleFunction
     if isinstance(obj, BoundModuleFunction):
         return obj.call([1, 2])
+
+**Class**
+- `CLASS Vec2` in module → `self.runtime.classes["Vec2"] = node`
+- After execution → `module.classes = self.runtime.classes.copy()`
+- Access: `NEW module.Vec2(...)` → `obj.classes.get("Vec2")`
 
 ---
 
