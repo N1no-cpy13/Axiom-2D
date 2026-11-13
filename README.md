@@ -2,7 +2,7 @@
 # Axiom-2D
 # Tick-Based Game Engine
 
-![Version](https://img.shields.io/badge/version-0.6.0--alpha-blue)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Python](https://img.shields.io/badge/python-3.8%2B-yellow)
 
@@ -19,10 +19,10 @@
 - **Entity System** - Health, position, velocity, collision, tags, teleport, heal
 - **World Queries** - Find by role, tag, radius, nearest
 - **AXM Scripting Language** - Custom syntax with lexer, parser, runtime
+- **Object-Oriented** - `CLASS`, `NEW`, `SELF`, `SUPER`, inheritance, method override
 - **AXC Module System** - Import `.axc` modules, namespaces, nested imports
-- **Dict & List** - `{"key": value}`, `[1, 2, 3]`, nested, chained
+- **Dict, List, NULL** - `{"key": value}`, `[1, 2, 3]`, `NULL` keyword
 - **Deprecation System** - Warn user about old syntax (configurable)
-- **ANSI Color Support** - `colorama.axc` module with `ENABLE_ANSI()`
 - **JSON Configuration** - Easy world setup
 - **No Dependencies** - Pure Python standard library
 
@@ -67,6 +67,45 @@ python axiom.py
 
 ---
 
+## Object-Oriented Programming
+
+AXM now supports classes, inheritance, and method overriding.
+
+```axm
+CLASS Animal
+  VAR name = "Animal"
+  VAR sound = "..."
+  
+  TASK __init__(name)
+    SELF.name = name
+  
+  TASK speak()
+    RETURN name + " says " + sound
+
+CLASS Dog EXTENDS Animal
+  TASK __init__(name)
+    SUPER().__init__(name)
+    SELF.sound = "Woof"
+  
+  TASK speak()
+    RETURN "Dog: " + SUPER().speak()
+
+VAR d = NEW Dog("Rex")
+SAYF "d.speak(): {d.speak()}"
+# Output: Dog: Rex says Woof
+```
+
+**Features:**
+- `CLASS` declaration with `VAR` (attributes) and `TASK` (methods)
+- `NEW` to instantiate
+- `SELF` for instance reference
+- `SUPER()` for parent method/constructor access
+- Single inheritance with `EXTENDS`
+- Method overriding
+- Deep copy of default attributes
+
+---
+
 ## Module System (AXC)
 
 **AXC** (AXIOM Class) — module system for AXM.
@@ -94,13 +133,11 @@ SAYF "1 + 2 = {utils.Add(1, 2)}"
 [AXIOM] 1 + 2 = 3
 ```
 
-**Features**:
+**Features:**
 
-- Import: `IMPORT "path/to/module.axc"`
-- Access: `module_name.variable`, `module_name.Function()`
-- Scope: only global variables & functions exported
-- Nested import: modules can import other modules
+- Access: `module_name.variable`, `module_name.Function()`, `module_name.ClassName`
 - Circular check: prevents circular imports
+- Class in module: `NEW module.ClassName(...)`
 
 ---
 
@@ -129,27 +166,6 @@ KEYS(player)                   // ['name', 'health', 'gold', 'atk']
 VALUES(player)                 // ['Bro', 90, 50, 15]
 MERGE(dict1, dict2)
 CLEAR(dict)
-```
-
-**List** — ordered collection:
-
-```axm
-VAR items = [1, 2, 3, 4, 5]
-SAYF "{items[0]}"              // 1
-SAYF "{LEN(items)}"            // 5
-APPEND(items, 6)
-SAYF "{items}"                 // [1, 2, 3, 4, 5, 6]
-```
-
----
-
-## String Methods
-
-```axm
-UPPER("hello")                 // HELLO
-LOWER("WORLD")                 // world
-TRIM("  hi  ")                 // "hi"
-REPLACE("a-b-c", "-", "_")     // "a_b_c"
 ```
 
 ---
@@ -188,27 +204,6 @@ TASK add(a, b)
 
 ---
 
-## ANSI Color Support
-
-Use `colorama.axc` module to print colored text in terminal.
-
-```axm
-ENABLE_ANSI()  // required on Windows
-IMPORT "axm/modules/colorama.axc"
-
-colorama.Print("[red]Hello[/red] [green]World[/green]")
-```
-
-**Functions**:
-
-- `colorama.Print(text)` — parse `[color]...[/color]` tags and print
-- `colorama.Color(text, color_name)` — colorize single text
-- `colorama.StripColor(text)` — remove color tags
-
-**Available colors**: `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `bright_*`, `bg_*`, `bold`, `underline`, dll.
-
----
-
 ## Example Modules
 
 ```
@@ -217,10 +212,12 @@ axm/modules/
 ├── string.axc        — String utilities (Upper, Lower, Join, Replace, dll)
 ├── array.axc         — Array utilities (Sum, Average, Max, Min, Reverse, dll)
 ├── random.axc        — Random utilities (Bool, Choice, Shuffle, Dice, dll)
-├── vector.axc        — Vector math (Add, Dot, Distance, Rotate2D, dll)
+├── vector.axc        — Vector math (Vec2, Vec3, Add, Dot, Distance, dll)
 ├── color.axc         — Color utilities (RGB, Mix, Lighten, Invert, ToHex, dll)
 ├── validation.axc    — Validation (IsEmpty, IsNumeric, IsEmail, dll)
-└── colorama.axc      — ANSI color for terminal
+├── colorama.axc      — ANSI color for terminal
+├── inventory.axc     — Inventory & item management
+└── timer.axc         — Timer, Cooldown, Stopwatch
 ```
 
 **Usage**:
@@ -265,7 +262,6 @@ Documentations/
     ├── if_else.axm
     ├── lists.axm
     └── while.axm
-    └── dictionary.axm
 ```
 
 ---
@@ -314,26 +310,24 @@ Edit `GAME_CONFIG.json`:
 
 ---
 
-## 🐛 Recent Changes (v0.6.0-alpha)
+## 🐛 Recent Changes (v1.0.0)
 
 ### 🚀 New Features
 
-- **`TASK`** keyword (replaces `FUN`, which is deprecated)
-- **`CONTINUE`** statement for loops
+- **Object-Oriented Programming**: `CLASS`, `NEW`, `SELF`, `SUPER`, inheritance, method override
 - **`FOR ... IN`** now supports list and string iteration
 - **String methods**: `UPPER`, `LOWER`, `TRIM`, `REPLACE`
-- **ANSI color support**: `colorama.axc` module + `ENABLE_ANSI()` builtin
 - **Entity**: `max_health`, `tags`, `heal()`, `teleport()`, `distance_to()`, `clone()`, `to_dict()`
-- **World**: `find_by_tag()`, `get_entities_in_radius()`, `get_nearest_entity()`, `count_by_role()`
-- **`DICT`**: `{"key": value}`, dot/bracket access, nested, chained
-- **8 dict functions**: `HAS_KEY`, `GET_KEY`, `SET_KEY`, `DELETE_KEY`, `KEYS`, `VALUES`, `MERGE`, `CLEAR`
+- **Example modules**: `math`, `string`, `array`, `random`, `vector`, `color`, `validation`, `colorama`, `inventory`, `timer`
+
+---
 
 ### 🐛 Bug Fixes
 
-- `math.axc`: `Power` use `POW()` instead of `**`
-- Lexer: `COMMA` missing `continue` caused token skip
-- Parser: dict trailing comma handling
-- Engine: `update()` collision message logic, `try_move()` blocked reset
+- **`MethodCall`**: support Entity method & module function
+- **`ATAN2`, `ACOS`, `ASIN`**: added to builtins
+- **`CLASS`**: fix `SUPER()` resolution (owner class, not instance class)
+- **Module**: fix class registration in `.axc` modules
 
 ---
 
