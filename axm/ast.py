@@ -1,3 +1,4 @@
+
 # axm/ast.py
 
 class Node:
@@ -126,6 +127,7 @@ class FunctionDef(Node):
         self.name = name 
         self.params = params # list of Parameter objects
         self.body = body # list of statements
+        self.owner_class = None
     
     def __repr__(self):
         params_str = ', '.join([str(p) for p in self.params])
@@ -165,6 +167,14 @@ class Import(Node):
         self.path = path  # string 
     def __repr__(self):
         return f'Import("{self.path}")'
+
+class ClassDef(Node):
+    def __init__(self, name, parent, body):
+        self.name = name 
+        self.parent = parent # None or Expr or str 
+        self.body = body # List of Var and FunctionDef 
+    def __repr__(self):
+        return f"ClassDef({self.name}, parent={self.parent})"
 
 # ========== Expressions ==========
 class Expr(Node):
@@ -257,3 +267,18 @@ class DictAccess(Expr):
         self.key = key
     def __repr__(self):
         return f"DictAccess({self.target}[{self.key}])"
+
+class NewExpr(Expr):
+    def __init__(self, class_name, args):
+        self.class_name = class_name  # str atau Expr (Attribute)
+        self.args = args
+    def __repr__(self):
+        return f"New({self.class_name}, {self.args})"
+
+class SelfExpr(Expr):
+    def __repr__(self):
+        return "Self()"
+
+class SuperExpr(Expr):
+    def __repr__(self):
+        return "Super()"

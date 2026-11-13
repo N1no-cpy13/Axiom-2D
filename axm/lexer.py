@@ -8,7 +8,8 @@ KEYWORDS = {
     "NOT", "AND", "OR", "WHILE", "DO", "ELIF",
     "HEAL",
     "STR", "INT", "LIST", "BOOL", "NUM",
-    "IMPORT", "NULL"
+    "IMPORT", "NULL",
+    "CLASS", "NEW", "SELF", "SUPER", "EXTENDS"
 }
 
 # Deprecated keywords - still works, but warns user 
@@ -150,6 +151,7 @@ def lex(code: str):
             if ch == ',':
                 tokens.append(Token("COMMA", ",", line_no))
                 pos += 1
+                continue
             if ch == '{':
                 tokens.append(Token("LBRACE", "{", line_no))
                 bracket_lines += 1

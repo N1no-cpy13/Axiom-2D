@@ -445,3 +445,16 @@ class Builtins:
         elif n<0:
             return -1
         return 0
+    
+    def ATAN2(self, y, x):
+        return math.atan2(y, x)
+
+    def ACOS(self, n):
+        if n < -1 or n > 1:
+            raise RuntimeError(f"ACOS: input must be in [-1, 1], got {n}")
+        return math.acos(n)
+
+    def ASIN(self, n):
+        if n < -1 or n > 1:
+            raise RuntimeError(f"ASIN: input must be in [-1, 1], got {n}")
+        return math.asin(n)

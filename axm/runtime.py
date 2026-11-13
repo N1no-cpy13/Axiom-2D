@@ -5,6 +5,29 @@ from .ast import *
 from .signals import Signal, ReturnSignal, BreakSignal, ContinueSignal
 from .module_loader import ModuleLoader
 
+class Instance:
+    def __init__(self, class_def):
+        self.class_def = class_def
+        self.attrs = {}
+    def __repr__(self):
+        return f"<Instance of {self.class_def.name}>"
+
+class SuperProxy:
+    def __init__(self, instance, parent_class, runtime):
+        self.instance = instance
+        self.parent_class = parent_class
+        self.runtime = runtime
+    def __repr__(self):
+        return f"<Super of {self.instance.class_def.name}>"
+
+class BoundMethod:
+    def __init__(self, instance, method_def, runtime):
+        self.instance = instance
+        self.method_def = method_def
+        self.runtime = runtime
+    def __call__(self, *args):
+        return self.runtime._call_method(self.instance, self.method_def, list(args))
+
 class AXMRuntimeError(Exception):
     pass
 
@@ -13,6 +36,8 @@ class Runtime:
         self.world = world
         self.globals = {}
         self.functions = {}
+        
+        self.classes = {}
         
         self.running = True
         self.pc = 0
@@ -49,10 +74,18 @@ class Runtime:
         return True 
     
     def lookup(self, name):
+        # local scope first
         for scope in reversed(self.scope_stack):
             if name in scope:
                 return scope[name]
-        
+        # SELF attributes
+        for scope in reversed(self.scope_stack):
+            if "SELF" in scope:
+                instance = scope["SELF"]
+                if name in instance.attrs:
+                    return instance.attrs[name]
+                break
+        # global
         if name in self.globals:
             return self.globals[name] 
         
@@ -156,6 +189,56 @@ class Runtime:
             return self.scope_stack.pop()
         return None
     
+    def _resolve_class_ref(self, ref):
+        if ref is None:
+            return None
+        if isinstance(ref, ClassDef):
+            return ref
+        if isinstance(ref, str):
+            return self.classes.get(ref)
+        if isinstance(ref, Attribute):
+            obj = self.eval(ref.obj)
+            from .module_loader import Module
+            if isinstance(obj, Module):
+                return obj.classes.get(ref.attr)
+        return None
+    
+    def _find_method(self, class_def, name):
+        cur = class_def
+        while cur is not None:
+            if not isinstance(cur, ClassDef):
+                cur = self._resolve_class_ref(cur)
+                continue
+            for stmt in cur.body:
+                if isinstance(stmt, FunctionDef) and stmt.name == name:
+                    return stmt
+            cur = cur.parent  # sudah ClassDef atau None
+        return None
+    
+    def _call_method(self, instance, method_def, args):
+        self.push_scope({})
+        scope = self.current_scope()
+        scope["SELF"] = instance
+        scope["__CLASS__"] = getattr(method_def, 'owner_class', instance.class_def)
+        # bind parameter 
+        for i, param in enumerate(method_def.params):
+            if i < len(args):
+                scope[param.name] = args[i]
+            elif param.default is not None:
+                scope[param.name] = self.eval(param.default)
+            else:
+                self.pop_scope()
+                raise AXMRuntimeError(f"Missing parameter '{param.name}' for method '{method_def.name}'")
+        try:
+            for stmt in method_def.body:
+                result = self.execute_node(stmt)
+                if isinstance(result, ReturnSignal):
+                    return result.value
+            return None
+        finally:
+            self.pop_scope()
+            
+    
     def current_scope(self):
         return self.scope_stack[-1] if self.scope_stack else None
     
@@ -175,9 +258,77 @@ class Runtime:
             return expr.value 
         elif isinstance(expr, Null):
             return None
+        elif isinstance(expr, NewExpr):
+            # resolve class 
+            if isinstance(expr.class_name, str):
+                class_def = self.classes.get(expr.class_name)
+            else:
+                # Attribute: module.Class
+                obj = self.eval(expr.class_name.obj)
+                from .module_loader import Module
+                if isinstance(obj, Module):
+                    class_def = obj.classes.get(expr.class_name.attr)
+                else:
+                    obj = self.eval(expr.class_name.obj)
+                    from .module_loader import Module
+                    if isinstance(obj, Module):
+                        class_def = obj.classes.get(expr.class_name.attr)
+                    else:
+                        class_def = None
+            if class_def is None:
+                raise AXMRuntimeError(f"Class '{expr.class_name}' not found")
+            
+            instance = Instance(class_def)
+            
+            # deep copy default attrs from class and its parents
+            import copy
+            chain = []
+            cur = class_def
+            while cur is not None:
+                if not isinstance(cur, ClassDef):
+                    cur = self._resolve_class_ref(cur)
+                    continue
+                chain.append(cur)
+                cur = cur.parent
+            for cd in reversed(chain):
+                for stmt in cd.body:
+                    if isinstance(stmt, Var):
+                        val = self.eval(stmt.value)
+                        instance.attrs[stmt.name] = copy.deepcopy(val)
+            
+            # Call __init__ if exist
+            init_method = self._find_method(class_def, "__init__")
+            if init_method:
+                args = [self.eval(a) for a in expr.args]
+                self._call_method(instance, init_method, args)
+            
+            return instance
+        
+        elif isinstance(expr, SelfExpr):
+            # SELF only valid inside method
+            if not self.scope_stack:
+                raise AXMRuntimeError("SELF used outside method")
+            for scope in reversed(self.scope_stack):
+                if "SELF" in scope:
+                    return scope["SELF"]
+            raise AXMRuntimeError("SELF not found in scope")
+            
+        elif isinstance(expr, SuperExpr):
+            if not self.scope_stack:
+                raise AXMRuntimeError("SUPER used outside method")
+            for scope in reversed(self.scope_stack):
+                if "SELF" in scope:
+                    instance = scope["SELF"]
+                    owner_class = scope.get("__CLASS__")
+                    if owner_class is None or owner_class.parent is None:
+                        raise AXMRuntimeError("SUPER used in class without parent")
+                    return SuperProxy(instance, owner_class.parent, self)
+            raise AXMRuntimeError("SUPER not found in scope")
+            
         elif isinstance(expr, Variable):
             return self.lookup(expr.name)
-        
+            return val
+                
         elif isinstance(expr, EntityRef):
             return self.get_entity(expr.name)
         
@@ -190,6 +341,22 @@ class Runtime:
                 if attr_name not in obj:
                     raise AXMRuntimeError(f"Dict key '{attr_name}' not found")
                 return obj[attr_name]
+            
+            if isinstance(obj, Instance):
+                if attr_name in obj.attrs:
+                    return obj.attrs[attr_name]
+                # search method
+                method = self._find_method(obj.class_def, attr_name)
+                if method:
+                    return BoundMethod(obj, method, self)
+                raise AXMRuntimeError(f"Instance of '{obj.class_def.name}' has no attribute '{attr_name}'")
+                
+            # SuperProxy handling
+            if isinstance(obj, SuperProxy):
+                method = self._find_method(obj.parent_class, attr_name)
+                if method:
+                    return BoundMethod(obj.instance, method, self)
+                raise AXMRuntimeError(f"Parent class has no attribute '{attr_name}'")
             
             # Module handling
             from .module_loader import Module, BoundModuleFunction 
@@ -272,6 +439,19 @@ class Runtime:
             
         elif isinstance(expr, MethodCall):
             obj = self.eval(expr.obj)
+            
+            if isinstance(obj, Instance):
+                method = self._find_method(obj.class_def, expr.method)
+                if method is None:
+                    raise AXMRuntimeError(f"Instance of '{obj.class_def.name}' has no method '{expr.method}'")
+                args = [self.eval(a) for a in expr.args]
+                return self._call_method(obj, method, args)
+            if isinstance(obj, SuperProxy):
+                method = self._find_method(obj.parent_class, expr.method)
+                if method is None:
+                    raise AXMRuntimeError(f"Parent class has no method '{expr.method}'")
+                args = [self.eval(a) for a in expr.args]
+                return self._call_method(obj.instance, method, args)
             
             # Module bound function
             from .module_loader import BoundModuleFunction
@@ -515,6 +695,10 @@ class Runtime:
                 obj = self.eval(node.name.obj)
                 attr_name = node.name.attr 
                 
+                if isinstance(obj, Instance):
+                    obj.attrs[attr_name] = value
+                    return value
+                
                 # Dict attribute assignment
                 if isinstance(obj, dict):
                     obj[attr_name] = value 
@@ -540,6 +724,16 @@ class Runtime:
                         scope[var_name] = value 
                         found = True 
                         break 
+                        
+                if not found:
+                    # Check SELF
+                    for scope in reversed(self.scope_stack):
+                        if "SELF" in scope:
+                            instance = scope["SELF"]
+                            if var_name in instance.attrs:
+                                instance.attrs[var_name] = value
+                                found = True
+                                break
                
                 if not found:
                     if var_name in self.globals:
@@ -567,6 +761,16 @@ class Runtime:
                 if builtinf and callable(builtinf):
                     arg_vals = [self.eval(arg) for arg in node.args]
                     return builtinf(*arg_vals)
+                
+                                # Try SELF method
+                for scope in reversed(self.scope_stack):
+                    if "SELF" in scope:
+                        instance = scope["SELF"]
+                        method = self._find_method(instance.class_def, node.name)
+                        if method:
+                            args = [self.eval(arg) for arg in node.args]
+                            return self._call_method(instance, method, args)
+                        break
                 
                 # Suggestion for function 
                 all_names = self._get_all_variable_name()
@@ -681,7 +885,24 @@ class Runtime:
         elif isinstance(node, Import):
             module = self.module_loader.load(node.path)
             module_name = node.path.replace(".axc", "").split("/")[-1].split("\\")[-1]
-            self.globals[module_name] = module 
+            self.globals[module_name] = module
+            # Daftarkan class dari module ke runtime utama (jika belum ada)
+            for cls_name, cls_def in module.classes.items():
+                if cls_name not in self.classes:
+                    self.classes[cls_name] = cls_def
+        
+        elif isinstance(node, ClassDef):
+            # Resolve parent to ClassDef reference
+            if node.parent is not None:
+                resolved = self._resolve_class_ref(node.parent)
+                if resolved is None:
+                    raise AXMRuntimeError(f"Parent class '{node.parent}' not found")
+                node.parent = resolved
+            # Save owner_class for every method
+            for stmt in node.body:
+                if isinstance(stmt, FunctionDef):
+                    stmt.owner_class = node
+            self.classes[node.name] = node
         
         # WHILE
         elif isinstance(node, While):

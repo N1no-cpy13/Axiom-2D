@@ -185,6 +185,91 @@ class Parser:
                 
             raise ParserError(f"Type keyword '{name}' must be followed by '('")
             
+        if token.type == "NEW":
+            self.eat("NEW")
+            if self.cur().type != "IDENT":
+                raise ParserError("Expected class name after NEW")
+            class_name = self.cur().value 
+            self.eat("IDENT")
+            # support module.Class
+            while self.cur().type == "DOT":
+                self.eat("DOT")
+                if self.cur().type != "IDENT":
+                    raise ParserError("Expected attribute name after '.'")
+                attr = self.cur().value
+                self.eat("IDENT")
+                class_name = Attribute(Variable(class_name), attr)
+            # Argument 
+            self.eat("LPAREN")
+            self.skip_newlines()
+            args = []
+            if self.cur().type != "RPAREN":
+                args.append(self.parse_expression())
+                self.skip_newlines()
+                while self.cur().type == "COMMA":
+                    self.eat("COMMA")
+                    self.skip_newlines()
+                    args.append(self.parse_expression())
+                    self.skip_newlines()
+            self.eat("RPAREN")
+            return NewExpr(class_name, args)
+        
+        if token.type == "SELF":
+            self.eat("SELF")
+            expr = SelfExpr()
+            # handle postfix
+            while True:
+                if self.cur().type == "DOT":
+                    self.eat("DOT")
+                    if self.cur().type != "IDENT":
+                        raise ParserError("Expected attribute name after '.'")
+                    attr = self.cur().value
+                    self.eat("IDENT")
+                    if self.cur().type == "LPAREN":
+                        self.eat("LPAREN")
+                        args = []
+                        if self.cur().type != "RPAREN":
+                            args.append(self.parse_expression())
+                            while self.cur().type == "COMMA":
+                                self.eat("COMMA")
+                                args.append(self.parse_expression())
+                        self.eat("RPAREN")
+                        expr = MethodCall(Attribute(expr, attr), attr, args)
+                    else:
+                        expr = Attribute(expr, attr)
+                else:
+                    break
+            return expr
+        
+        if token.type == "SUPER":
+            self.eat("SUPER")
+            self.eat("LPAREN")
+            self.eat("RPAREN")
+            expr = SuperExpr()
+            # handle postfix (DOT + method call)
+            while True:
+                if self.cur().type == "DOT":
+                    self.eat("DOT")
+                    if self.cur().type != "IDENT":
+                        raise ParserError("Expected attribute name after '.'")
+                    attr = self.cur().value
+                    self.eat("IDENT")
+                    if self.cur().type == "LPAREN":
+                        self.eat("LPAREN")
+                        args = []
+                        if self.cur().type != "RPAREN":
+                            args.append(self.parse_expression())
+                            while self.cur().type == "COMMA":
+                                self.eat("COMMA")
+                                args.append(self.parse_expression())
+                        self.eat("RPAREN")
+                        expr = MethodCall(Attribute(expr, attr), attr, args)
+                    else:
+                        expr = Attribute(expr, attr)
+                else:
+                    break
+            return expr
+        
         if token.type == "IDENT":
             name = token.value 
             self.eat("IDENT")
@@ -279,7 +364,7 @@ class Parser:
                         self.eat("STRING")
                     else:
                         key = self.parse_expression()
-                    
+                                        
                     self.eat("COLON")
                     value = self.parse_expression()
                     pairs.append((key, value))
@@ -294,7 +379,7 @@ class Parser:
             self.eat("RBRACE")
             return DictLiteral(pairs)
         else:
-            raise ParserError(f"Unexpected token in expression: {token.type}")
+            raise ParserError(f"Unexpected token in expression: {token.type} at line {token.line}")
         
     def parse_primary(self):
         expr = self.parse_primary_atom()
@@ -386,6 +471,8 @@ class Parser:
     def statement(self):
         t = self.cur()
         
+        if t.type == "CLASS":
+            return self.parse_class_def()
         if t.type == "FUN" or t.type == "TASK":
             return self.parse_function_def()
         if t.type == "IMPORT":
@@ -428,6 +515,18 @@ class Parser:
                 return self.parse_entity_action_from_expr(expr)
             
             return expr 
+        
+        if t.type == "SELF" or t.type == "SUPER":
+            expr = self.parse_primary()
+            
+            if self.cur().type == "ASSIGN":
+                self.eat("ASSIGN")
+                value = self.parse_expression()
+                self.skip_newlines()
+                return Assignment(expr, value)
+            
+            self.skip_newlines()
+            return expr
         
         if t.type == "IDENT":
             name = t.value 
@@ -614,7 +713,52 @@ class Parser:
         self.skip_newlines()
             
         return FunctionDef(name, params, body)
+    
+    def parse_class_def(self):
+        self.eat("CLASS")
+        if self.cur().type != "IDENT":            
+            raise ParserError(f"Expected class name after CLASS, got {self.cur().type}")
+        
+        name = self.cur().value 
+        self.eat("IDENT")
+        
+        parent = None
+        if self.cur().type == "EXTENDS":
+            self.eat("EXTENDS")
+            # parent can IDENT (local class) or module.Class (Attribute)
+            if self.cur().type != "IDENT":
+                raise ParserError("Expected class name after EXTENDS")
+            parent_name = self.cur().value 
+            self.eat("IDENT")
+            if self.cur().type == "DOT":
+                self.eat("DOT")
+                if self.cur().type != "IDENT":
+                    raise ParserError("Expected attribute name after '.'")
+                attr = self.cur().value 
+                self.eat("IDENT")
+                parent = Attribute(Variable(parent_name), attr)
+            else:
+                parent = parent_name
                 
+        self.skip_newlines()
+        self.eat("INDENT")
+        
+        body = []
+        while self.cur().type != "DEDENT":
+            if self.cur().type == "NEWLINE":
+                self.eat("NEWLINE")
+                continue 
+            if self.cur().type == "VAR":
+                body.append(self.parse_var_declaration())
+            elif self.cur().type in ("FUN", "TASK"):
+                body.append(self.parse_function_def())
+            else:
+                raise ParserError(f"Only VAR and TASK allowed in CLASS body, got {self.cur().type}")
+        self.eat("DEDENT")
+        self.skip_newlines()
+
+        return ClassDef(name, parent, body)
+            
     def parse_say(self):
         self.eat("SAY")
         if self.cur().type == "STRING":
