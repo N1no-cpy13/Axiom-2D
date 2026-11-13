@@ -1,0 +1,178 @@
+// timer.axc - Timer & Cooldown module
+// Usage: IMPORT "axm/modules/timer.axc"
+
+VAR __VERSION__ = "1.0"
+VAR __AUTHOR__ = "AXIOM TEAM"
+
+// ============================================
+// CLASS Timer
+// ============================================
+CLASS Timer
+  VAR duration = 0
+  VAR start_time = 0
+  VAR paused = FALSE
+  VAR pause_time = 0
+  
+  TASK __init__(duration = 1000)
+    SELF.duration = duration
+    SELF.start_time = TIME()
+  
+  TASK reset()
+    SELF.start_time = TIME()
+    SELF.paused = FALSE
+    SELF.pause_time = 0
+    RETURN SELF
+  
+  TASK pause()
+    IF NOT paused
+      SELF.paused = TRUE
+      SELF.pause_time = TIME()
+    RETURN SELF
+  
+  TASK resume()
+    IF paused
+      VAR paused_duration = TIME() - pause_time
+      SELF.start_time = SELF.start_time + paused_duration
+      SELF.paused = FALSE
+    RETURN SELF
+  
+  TASK elapsed()
+    IF paused
+      RETURN pause_time - start_time
+    RETURN TIME() - start_time
+  
+  TASK remaining()
+    VAR rem = duration - elapsed()
+    IF rem < 0
+      RETURN 0
+    RETURN rem
+  
+  TASK is_done()
+    RETURN elapsed() >= duration
+  
+  TASK progress()
+    IF duration == 0
+      RETURN 1.0
+    VAR p = elapsed() / duration
+    IF p > 1.0
+      RETURN 1.0
+    RETURN p
+  
+  TASK to_string()
+    RETURN "Timer(" + STR(elapsed()) + "/" + STR(duration) + "ms)"
+
+// ============================================
+// CLASS Cooldown
+// ============================================
+CLASS Cooldown
+  VAR duration = 0
+  VAR last_used = 0
+  VAR ready = TRUE
+  
+  TASK __init__(duration = 1000)
+    SELF.duration = duration
+    SELF.last_used = 0
+    SELF.ready = TRUE
+  
+  TASK use()
+    IF ready
+      SELF.last_used = TIME()
+      SELF.ready = FALSE
+      RETURN TRUE
+    RETURN FALSE
+  
+  TASK update()
+    IF NOT ready
+      IF TIME() - last_used >= duration
+        SELF.ready = TRUE
+    RETURN ready
+  
+  TASK is_ready()
+    RETURN update()
+  
+  TASK remaining()
+    IF ready
+      RETURN 0
+    VAR rem = duration - (TIME() - last_used)
+    IF rem < 0
+      RETURN 0
+    RETURN rem
+  
+  TASK reset()
+    SELF.ready = TRUE
+    SELF.last_used = 0
+    RETURN SELF
+  
+  TASK to_string()
+    IF ready
+      RETURN "Cooldown(ready)"
+    RETURN "Cooldown(" + STR(remaining()) + "ms left)"
+
+// ============================================
+// CLASS Stopwatch
+// ============================================
+CLASS Stopwatch
+  VAR start_time = 0
+  VAR running = FALSE
+  VAR total_paused = 0
+  VAR pause_start = 0
+  
+  TASK __init__()
+    SELF.start_time = 0
+    SELF.running = FALSE
+    SELF.total_paused = 0
+    SELF.pause_start = 0
+  
+  TASK start()
+    IF NOT running
+      SELF.start_time = TIME() - total_paused
+      SELF.running = TRUE
+    RETURN SELF
+  
+  TASK stop()
+    IF running
+      SELF.running = FALSE
+      SELF.pause_start = TIME()
+    RETURN SELF
+  
+  TASK pause()
+    IF running
+      SELF.running = FALSE
+      SELF.pause_start = TIME()
+    RETURN SELF
+  
+  TASK resume()
+    IF NOT running AND pause_start > 0
+      SELF.total_paused = total_paused + (TIME() - pause_start)
+      SELF.running = TRUE
+      SELF.pause_start = 0
+    RETURN SELF
+  
+  TASK elapsed()
+    IF NOT running
+      IF pause_start > 0
+        RETURN pause_start - start_time - total_paused
+      RETURN 0
+    RETURN TIME() - start_time - total_paused
+  
+  TASK reset()
+    SELF.start_time = 0
+    SELF.running = FALSE
+    SELF.total_paused = 0
+    SELF.pause_start = 0
+    RETURN SELF
+  
+  TASK to_string()
+    RETURN "Stopwatch(" + STR(elapsed()) + "ms, running=" + STR(running) + ")"
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+TASK create_timer(duration = 1000)
+  RETURN NEW Timer(duration)
+
+TASK create_cooldown(duration = 1000)
+  RETURN NEW Cooldown(duration)
+
+TASK create_stopwatch()
+  RETURN NEW Stopwatch()

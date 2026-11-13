@@ -1,0 +1,298 @@
+// inventory.axc - Inventory & Item management module
+// Usage: IMPORT "axm/modules/inventory.axc"
+
+VAR __VERSION__ = "1.0"
+VAR __AUTHOR__ = "AXIOM TEAM"
+
+// ============================================
+// CLASS Item
+// ============================================
+CLASS Item
+  VAR name = ""
+  VAR description = ""
+  VAR price = 0
+  VAR quantity = 1
+  VAR max_stack = 99
+  VAR item_type = "misc"
+  VAR rarity = "common"
+  VAR stats = {}
+  
+  TASK __init__(name, price = 0, quantity = 1)
+    SELF.name = name
+    SELF.price = price
+    SELF.quantity = quantity
+  
+  TASK set_description(desc)
+    SELF.description = desc
+    RETURN SELF
+  
+  TASK set_type(t)
+    SELF.item_type = t
+    RETURN SELF
+  
+  TASK set_rarity(r)
+    SELF.rarity = r
+    RETURN SELF
+  
+  TASK set_stat(key, value)
+    SELF.stats[key] = value
+    RETURN SELF
+  
+  TASK get_stat(key, default = 0)
+    IF HAS_KEY(stats, key)
+      RETURN stats[key]
+    RETURN default
+  
+  TASK total_value()
+    RETURN price * quantity
+  
+  TASK is_stackable()
+    RETURN max_stack > 1
+  
+  TASK can_stack_with(other)
+    IF name != other.name
+      RETURN FALSE
+    IF item_type != other.item_type
+      RETURN FALSE
+    RETURN TRUE
+  
+  TASK add_quantity(n)
+    quantity = quantity + n
+    IF quantity > max_stack
+      VAR overflow = quantity - max_stack
+      quantity = max_stack
+      RETURN overflow
+    RETURN 0
+  
+  TASK remove_quantity(n)
+    IF n >= SELF.quantity
+      VAR removed = SELF.quantity
+      SELF.quantity = 0
+      RETURN removed
+    SELF.quantity = SELF.quantity - n
+    RETURN n
+  
+  TASK to_dict()
+    RETURN {
+      "name": name,
+      "description": description,
+      "price": price,
+      "quantity": quantity,
+      "max_stack": max_stack,
+      "type": item_type,
+      "rarity": rarity,
+      "stats": stats
+    }
+  
+  TASK to_string()
+    RETURN name + " x" + STR(quantity) + " (" + rarity + " " + item_type + ")"
+
+// ============================================
+// CLASS ItemFactory
+// ============================================
+CLASS ItemFactory
+  TASK create_weapon(name, damage, price)
+    VAR item = NEW Item(name, price)
+    item.set_type("weapon")
+    item.set_stat("damage", damage)
+    RETURN item
+  
+  TASK create_armor(name, defense, price)
+    VAR item = NEW Item(name, price)
+    item.set_type("armor")
+    item.set_stat("defense", defense)
+    RETURN item
+  
+  TASK create_consumable(name, heal, price)
+    VAR item = NEW Item(name, price)
+    item.set_type("consumable")
+    item.set_stat("heal", heal)
+    RETURN item
+  
+  TASK create_potion(name, heal, price)
+    RETURN SELF.create_consumable(name, heal, price)
+  
+  TASK create_gold(amount)
+    VAR item = NEW Item("Gold", 1, amount)
+    item.set_type("currency")
+    item.set_rarity("common")
+    RETURN item
+
+// ============================================
+// CLASS Inventory
+// ============================================
+CLASS Inventory
+  VAR items = []
+  VAR max_slots = 20
+  VAR owner_name = "Player"
+  
+  TASK __init__(max_slots = 20)
+    SELF.max_slots = max_slots
+  
+  TASK _filter_not_null(lst)
+    VAR result = []
+    FOR item IN lst
+      IF item != NULL
+        APPEND(result, item)
+    RETURN result
+  
+  TASK is_full()
+    RETURN LEN(items) >= max_slots
+  
+  TASK size()
+    RETURN LEN(items)
+  
+  TASK is_empty()
+    RETURN LEN(items) == 0
+  
+  TASK add(item)
+    FOR existing IN items
+      IF existing.can_stack_with(item)
+        VAR overflow = existing.add_quantity(item.quantity)
+        IF overflow == 0
+          RETURN TRUE
+        item.quantity = overflow
+    
+    IF is_full()
+      RETURN FALSE
+    APPEND(items, item)
+    RETURN TRUE
+  
+  TASK add_many(item_list)
+    VAR added = 0
+    FOR item IN item_list
+      IF add(item)
+        added = added + 1
+    RETURN added
+  
+  TASK remove(item_name, quantity = 1)
+    VAR i = 0
+    WHILE i < LEN(SELF.items) DO
+      VAR item = SELF.items[i]
+      IF item.name == item_name
+        VAR removed = item.remove_quantity(quantity)
+        IF item.quantity <= 0
+          SELF.items[i] = NULL
+          SELF.items = SELF._filter_not_null(SELF.items)
+        RETURN removed
+      i += 1
+    RETURN 0
+  
+  TASK remove_at(index)
+    IF index < 0 OR index >= LEN(items)
+      RETURN NULL
+    VAR item = items[index]
+    items[index] = NULL
+    items = _filter_not_null(items)
+    RETURN item
+  
+  TASK get(item_name)
+    FOR item IN items
+      IF item.name == item_name
+        RETURN item
+    RETURN NULL
+  
+  TASK has(item_name)
+    RETURN get(item_name) != NULL
+  
+  TASK count(item_name)
+    VAR total = 0
+    FOR item IN items
+      IF item.name == item_name
+        total = total + item.quantity
+    RETURN total
+  
+  TASK get_by_type(item_type)
+    VAR result = []
+    FOR item IN items
+      IF item.item_type == item_type
+        APPEND(result, item)
+    RETURN result
+  
+  TASK get_by_rarity(rarity)
+    VAR result = []
+    FOR item IN items
+      IF item.rarity == rarity
+        APPEND(result, item)
+    RETURN result
+  
+  TASK get_weapons()
+    RETURN get_by_type("weapon")
+  
+  TASK get_armors()
+    RETURN get_by_type("armor")
+  
+  TASK get_consumables()
+    RETURN get_by_type("consumable")
+  
+  TASK total_value()
+    VAR total = 0
+    FOR item IN items
+      total = total + item.total_value()
+    RETURN total
+  
+  TASK sort_by_name()
+    SORT(items, FALSE)
+    RETURN SELF
+  
+  TASK sort_by_price(reverse = TRUE)
+    VAR n = LEN(items)
+    VAR i = 0
+    WHILE i < n - 1 DO
+      VAR j = i + 1
+      WHILE j < n DO
+        VAR should_swap = FALSE
+        IF reverse
+          IF items[j].price > items[i].price
+            should_swap = TRUE
+        ELSE
+          IF items[j].price < items[i].price
+            should_swap = TRUE
+        IF should_swap
+          VAR temp = items[i]
+          items[i] = items[j]
+          items[j] = temp
+        j = j + 1
+      i = i + 1
+    RETURN SELF
+  
+  TASK clear()
+    items = []
+    RETURN SELF
+  
+  TASK to_dict()
+    VAR result = []
+    FOR item IN items
+      APPEND(result, item.to_dict())
+    RETURN {
+      "owner": owner_name,
+      "max_slots": max_slots,
+      "items": result
+    }
+  
+  TASK to_string()
+    VAR result = "Inventory of " + owner_name + " (" + STR(size()) + "/" + STR(max_slots) + "):"
+    FOR item IN items
+      result = result + "\n  - " + item.to_string()
+    RETURN result
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+TASK create_inventory(max_slots = 20)
+  RETURN NEW Inventory(max_slots)
+
+TASK create_item(name, price = 0, quantity = 1)
+  RETURN NEW Item(name, price, quantity)
+
+TASK create_weapon(name, damage, price)
+  VAR factory = NEW ItemFactory()
+  RETURN factory.create_weapon(name, damage, price)
+
+TASK create_armor(name, defense, price)
+  VAR factory = NEW ItemFactory()
+  RETURN factory.create_armor(name, defense, price)
+
+TASK create_potion(name, heal, price)
+  VAR factory = NEW ItemFactory()
+  RETURN factory.create_potion(name, heal, price)
