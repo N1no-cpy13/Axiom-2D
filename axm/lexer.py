@@ -132,10 +132,12 @@ def lex(code: str):
             # PARENTHESES, BRACKETS & COMMA
             if ch == '(':
                 tokens.append(Token("LPAREN", "(", line_no))
+                bracket_lines += 1
                 pos += 1
                 continue
             if ch == ')':
                 tokens.append(Token("RPAREN", ")", line_no))
+                bracket_lines -= 1
                 pos += 1
                 continue
             if ch == '[':
