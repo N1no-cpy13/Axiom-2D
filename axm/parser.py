@@ -209,6 +209,8 @@ class Parser:
                 while self.cur().type == "COMMA":
                     self.eat("COMMA")
                     self.skip_newlines()
+                    if self.cur().type == "RPAREN":
+                        break
                     args.append(self.parse_expression())
                     self.skip_newlines()
             self.eat("RPAREN")
@@ -345,6 +347,8 @@ class Parser:
                 while self.cur().type == "COMMA":
                     self.eat("COMMA")
                     self.skip_newlines()
+                    if self.cur().type == "RPAREN":
+                        break
                     elements.append(self.parse_expression())
                     self.skip_newlines()
             
