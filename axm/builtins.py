@@ -206,7 +206,7 @@ class Builtins:
             obj = obj.value
     
         # Check supported data type
-        if isinstance(obj, (list, str)):
+        if isinstance(obj, (list, str, dict)):
             return len(obj)
         else:
             raise RuntimeError(f"LEN: expected list or string, got {type(obj).__name__}")
