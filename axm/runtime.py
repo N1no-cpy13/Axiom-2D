@@ -60,6 +60,10 @@ class Runtime:
             return "TRUE" if value else "FALSE"
         if value is None:
             return "NULL"
+        if isinstance(value, Instance):
+            method = self._find_method(value.class_def, "to_string")
+            if method:
+                return self._call_method(value, method, [])
         return str(value)
     
     def is_truthy(self, value):
@@ -493,8 +497,18 @@ class Runtime:
             if isinstance(target, dict):
                 if index not in target:
                     raise AXMRuntimeError(f"Dict key '{index}' not found")
-                
                 return target[index]
+            
+            # instance attribute indexing (dynamic getattr)
+            if isinstance(target, Instance):
+                if isinstance(index, str):
+                    if index in target.attrs:
+                        return target.attrs[index]
+                    method = self._find_method(target.class_def, index)
+                    if method:
+                        return BoundMethod(target, method, self)
+                    raise AXMRuntimeError(f"Instance of '{target.class_def.name}' has no attribute '{index}'")
+                raise AXMRuntimeError(f"Instance index must be string, got {type(index).__name__}")
             
             if not isinstance(index, int):
                 raise AXMRuntimeError(f"Index must be integer, got {type(index).__name__}")
@@ -677,6 +691,13 @@ class Runtime:
                 if isinstance(target, dict):
                     target[index] = value 
                     return value
+                
+                # Instance attribute assignment (dynamic setattr)
+                if isinstance(target, Instance):
+                    if isinstance(index, str):
+                        target.attrs[index] = value
+                        return value
+                    raise AXMRuntimeError(f"Instance index must be string, got {type(index).__name__}")
                 
                 if not isinstance(target, list):
                     raise AXMRuntimeError(f"Cannot assign to index of non-list: {type(target).__name__}")
