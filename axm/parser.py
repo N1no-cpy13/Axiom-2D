@@ -491,6 +491,8 @@ class Parser:
             return self.parse_return()
         if t.type == "IF":
             return self.parse_if()
+        if t.type == "SWITCH":
+            return self.parse_switch()
         if t.type == "WHILE":
             return self.parse_while()
         if t.type == "SAY":
@@ -645,6 +647,37 @@ class Parser:
         
         return If(condition, body, elifs, else_body)
         
+    def parse_switch(self):
+        self.eat("SWITCH")
+        subject = self.parse_expression()
+        self.skip_newlines()
+        self.eat("INDENT")
+        
+        cases = []
+        default_body = None
+        
+        while self.cur().type != "DEDENT":
+            if self.cur().type == "NEWLINE":
+                self.eat("NEWLINE")
+                continue
+            if self.cur().type == "CASE":
+                self.eat("CASE")
+                case_expr = self.parse_expression()
+                self.skip_newlines()
+                self.eat("INDENT")
+                body = self.parse_block()
+                cases.append((case_expr, body))
+            elif self.cur().type == "DEFAULT":
+                self.eat("DEFAULT")
+                self.skip_newlines()
+                self.eat("INDENT")
+                default_body = self.parse_block()
+            else:
+                raise ParserError(f"Expected CASE or DEFAULT in SWITCH, got {self.cur().type}")
+        
+        self.eat("DEDENT")
+        self.skip_newlines()
+        return Switch(subject, cases, default_body)
     
     def parse_while(self):
         self.eat("WHILE")

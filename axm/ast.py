@@ -51,6 +51,14 @@ class If(Node):
     def __repr__(self):
         return f"If(cond={self.condition}, body={self.body}, elifs={self.elifs}, else={self.else_body})"
 
+class Switch(Node):
+    def __init__(self, subject, cases, default_body):
+        self.subject = subject # Expr
+        self.cases = cases # list of (case_expr, body)
+        self.default_body = default_body
+    def __repr__(self):
+        return f"Switch({self.subject}, cases={self.cases}, default={self.default_body})"
+
 class While(Node):
     def __init__(self, condition, body):
         self.condition = condition

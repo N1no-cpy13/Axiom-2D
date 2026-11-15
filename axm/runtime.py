@@ -666,9 +666,6 @@ class Runtime:
                         return result 
             finally:
                 self.pop_scope()
-                    
-                    
-
 
         # VAR DECL
         elif isinstance(node, Var):
@@ -903,6 +900,31 @@ class Runtime:
                         return result
                 finally:
                     self.pop_scope()
+        
+        elif isinstance(node, Switch):
+            subject_val = self.eval(node.subject)
+            matched = False
+            for case_expr, body in node.cases:
+                case_val = self.eval(case_expr)
+                if subject_val == case_val:
+                    matched = True
+                    self.push_scope({})
+                    try:
+                        result = self.execute_block(body)
+                        if isinstance(result, Signal):
+                            return result
+                    finally:
+                        self.pop_scope()
+                    break
+            if not matched and node.default_body is not None:
+                self.push_scope({})
+                try:
+                    result = self.execute_block(node.default_body)
+                    if isinstance(result, Signal):
+                        return result
+                finally:
+                    self.pop_scope()
+            return None
         
         elif isinstance(node, Import):
             module = self.module_loader.load(node.path)

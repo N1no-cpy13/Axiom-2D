@@ -9,7 +9,8 @@ KEYWORDS = {
     "HEAL",
     "STR", "INT", "LIST", "BOOL", "NUM",
     "IMPORT", "NULL",
-    "CLASS", "NEW", "SELF", "SUPER", "EXTENDS"
+    "CLASS", "NEW", "SELF", "SUPER", "EXTENDS",
+    "SWITCH", "CASE", "DEFAULT"
 }
 
 # Deprecated keywords - still works, but warns user 
