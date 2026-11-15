@@ -25,6 +25,7 @@ Supports:
 - **Type keywords as function:** `INT("42")`, `STR(42)`, `BOOL(1)`, `LIST(1,2,3)`, `NUM("3.14")`
 - **Import:** `IMPORT "path/to/module.axc"`
 - **NULL:** `NULL` literal (falsy)
+- **Switch:** `SWITCH expr`, `CASE value`, `DEFAULT` (indent-based)
 
 ## Operator Precedence
 
@@ -64,6 +65,9 @@ Supports:
 - **`NEW module.Class`**: `NEW vector.Vec2(3, 4)` → `NewExpr(Attribute(Variable("vector"), "Vec2"), [...])`
 - **`SELF`**: `SELF.name` → `Attribute(SelfExpr(), "name")`
 - **`SUPER()`**: `SUPER().__init__(...)` → `MethodCall(Attribute(SuperExpr(), "__init__"), "__init__", [...])`
+- **`SWITCH`**: `SWITCH x ...` → `Switch(subject, cases, default_body)`
+- **`CASE`**: `CASE 1 ...` → `(case_expr, body)`
+- **`DEFAULT`**: `DEFAULT ...` → `default_body`
 
 ## Errors
 

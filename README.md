@@ -1,4 +1,6 @@
+Oke, ini `README.md` yang sudah dimodifikasi dengan tambahan `SWITCH/CASE/DEFAULT` dan beberapa perbaikan.
 
+```markdown
 # Axiom-2D
 # Tick-Based Game Engine
 
@@ -20,6 +22,7 @@
 - **World Queries** - Find by role, tag, radius, nearest
 - **AXM Scripting Language** - Custom syntax with lexer, parser, runtime
 - **Object-Oriented** - `CLASS`, `NEW`, `SELF`, `SUPER`, inheritance, method override
+- **Control Flow** - `IF/ELIF/ELSE`, `WHILE`, `FOR`, `SWITCH/CASE/DEFAULT`
 - **AXC Module System** - Import `.axc` modules, namespaces, nested imports
 - **Dict, List, NULL** - `{"key": value}`, `[1, 2, 3]`, `NULL` keyword
 - **Deprecation System** - Warn user about old syntax (configurable)
@@ -69,7 +72,7 @@ python axiom.py
 
 ## Object-Oriented Programming
 
-AXM now supports classes, inheritance, and method overriding.
+AXM supports classes, inheritance, and method overriding.
 
 ```axm
 CLASS Animal
@@ -103,6 +106,8 @@ SAYF "d.speak(): {d.speak()}"
 - Single inheritance with `EXTENDS`
 - Method overriding
 - Deep copy of default attributes
+- Dynamic attribute access (`instance[key]`)
+- `to_string()` automatically called on `SAY instance`
 
 ---
 
@@ -138,6 +143,7 @@ SAYF "1 + 2 = {utils.Add(1, 2)}"
 - Access: `module_name.variable`, `module_name.Function()`, `module_name.ClassName`
 - Circular check: prevents circular imports
 - Class in module: `NEW module.ClassName(...)`
+- Inheritance from module: `CLASS Child EXTENDS module.Parent`
 
 ---
 
@@ -157,6 +163,32 @@ SAY VALUES(d1)                     // [3]
 VAR merged = MERGE(d1, d2)
 SAY CLEAR(d1)
 ```
+
+---
+
+## Switch / Case
+
+```axm
+VAR x = 2
+
+SWITCH x
+  CASE 1
+    SAY "one"
+  CASE 2
+    SAY "two"
+  CASE 3
+    SAY "three"
+  DEFAULT
+    SAY "other"
+
+// Output: two
+```
+
+**Notes:**
+- Each `CASE` auto-break (no fall-through).
+- `DEFAULT` optional.
+- `CASE` can use expressions: `CASE score >= 90`.
+- Nested `SWITCH` supported.
 
 ---
 
@@ -304,20 +336,21 @@ Edit `GAME_CONFIG.json`:
 
 ### 🚀 New Features
 
+- **`SWITCH`/`CASE`/`DEFAULT`**: auto-break, expressions in case, nested switch
 - **Object-Oriented Programming**: `CLASS`, `NEW`, `SELF`, `SUPER`, inheritance, method override
-- **`FOR ... IN`** now supports list and string iteration
-- **String methods**: `UPPER`, `LOWER`, `TRIM`, `REPLACE`
-- **Entity**: `max_health`, `tags`, `heal()`, `teleport()`, `distance_to()`, `clone()`, `to_dict()`
-- **Example modules**: `math`, `string`, `array`, `random`, `vector`, `color`, `validation`, `colorama`, `inventory`, `timer`
+- **Dynamic attribute access**: `instance[key]` for get/set
+- **`to_string()`** automatically called on `SAY instance`
+- **Instance as dict key**
+- **`NEW` multi-line arguments**
 
 ---
 
 ### 🐛 Bug Fixes
 
-- **`MethodCall`**: support Entity method & module function
-- **`ATAN2`, `ACOS`, `ASIN`**: added to builtins
 - **`CLASS`**: fix `SUPER()` resolution (owner class, not instance class)
 - **Module**: fix class registration in `.axc` modules
+- **`LEN`**: support `dict`
+- **Lexer**: bracket for parentheses (multi-line function/new args)
 
 ---
 

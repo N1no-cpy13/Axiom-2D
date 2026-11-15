@@ -154,6 +154,17 @@ Quick reference for AXM language syntax.
     ELSE
       // code
 
+### SWITCH / CASE / DEFAULT
+
+    SWITCH expr
+      // code
+    CASE value1
+      // code
+    CASE value2
+      // code
+    DEFAULT
+      // code
+
 ### WHILE
 
     WHILE condition DO

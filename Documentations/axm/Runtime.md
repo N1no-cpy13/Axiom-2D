@@ -94,6 +94,14 @@ Handles:
 - **Override** — child method overrides parent
 - **Deep copy** — default attributes from class + parents are deep copied at `NEW`
 
+## Switch
+
+- `SWITCH expr` evaluates `expr` once.
+- Each `CASE value` is compared with `==`
+- If match, execute body and **stop** (auto-break).
+- `DEFAULT` executes if no case matches.
+- `CASE` body has its own scope.
+
 ## Sleep (Blocking)
 
 - `SLEEP duration unit` → `time.sleep(seconds)` (blocking)
