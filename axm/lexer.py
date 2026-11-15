@@ -204,6 +204,10 @@ def lex(code: str):
                 tokens.append(Token("OP", "<=", line_no))
                 pos += 2
                 continue
+            if line.startswith("**", pos):
+                tokens.append(Token("OP", "**", line_no))
+                pos += 2
+                continue
             
             if ch in "+-*/<>=":
                 if ch == '=':

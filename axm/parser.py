@@ -118,13 +118,31 @@ class Parser:
         return left 
     
     def parse_multiplication(self):
-        left = self.parse_primary()
+        left = self.parse_unary()
         while self.cur().type == "OP" and self.cur().value in ("*", "/"):
             op = self.cur().value 
             self.eat("OP")
-            right = self.parse_primary()
+            right = self.parse_unary()
             left = BinaryOp(left, op, right)
         return left 
+    
+    def parse_unary(self):
+        if self.cur().type == "OP" and self.cur().value in ("-", "+"):
+            op = self.cur().value
+            self.eat("OP")
+            operand = self.parse_unary()
+            if op == "-":
+                return BinaryOp(Number(0), "-", operand)
+            return operand
+        return self.parse_power()
+    
+    def parse_power(self):
+        left = self.parse_primary()
+        if self.cur().type == "OP" and self.cur().value == "**":
+            self.eat("OP")
+            right = self.parse_unary() # right-associative
+            return BinaryOp(left, "**", right)
+        return left
     
     def parse_primary_atom(self):
         token = self.cur()
