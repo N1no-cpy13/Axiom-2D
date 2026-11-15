@@ -1,0 +1,109 @@
+// class.axm - Class feature test
+
+CLASS Counter
+  VAR value = 0
+  
+  TASK increment()
+    value += 1
+    RETURN value
+  
+  TASK decrement()
+    value -= 1
+    RETURN value
+  
+  TASK reset()
+    value = 0
+    RETURN SELF
+
+VAR c = NEW Counter()
+c.increment()
+c.increment()
+c.decrement()
+SAYF "counter: {c.value}"
+
+CLASS Rect
+  VAR x = 0
+  VAR y = 0
+  VAR w = 0
+  VAR h = 0
+  
+  TASK __init__(x, y, w, h)
+    SELF.x = x
+    SELF.y = y
+    SELF.w = w
+    SELF.h = h
+  
+  TASK area()
+    RETURN w * h
+  
+  TASK contains(px, py)
+    RETURN px >= x AND px <= x + w AND py >= y AND py <= y + h
+  
+  TASK to_string()
+    RETURN "Rect(" + STR(x) + "," + STR(y) + " " + STR(w) + "x" + STR(h) + ")"
+
+VAR r = NEW Rect(10, 20, 100, 50)
+SAYF "rect: {r}"
+SAYF "area: {r.area()}"
+SAYF "contains(50, 30): {r.contains(50, 30)}"
+SAYF "contains(200, 30): {r.contains(200, 30)}"
+
+CLASS Node
+  VAR id = 0
+  VAR parent = NULL
+  
+  TASK __init__(id)
+    SELF.id = id
+  
+  TASK set_parent(p)
+    parent = p
+    RETURN SELF
+
+CLASS Transform EXTENDS Node
+  VAR px = 0
+  VAR py = 0
+  
+  TASK __init__(id, px, py)
+    SUPER().__init__(id)
+    SELF.px = px
+    SELF.py = py
+  
+  TASK to_string()
+    RETURN "Transform(id=" + STR(id) + ", pos=" + STR(px) + "," + STR(py) + ")"
+
+VAR root = NEW Transform(1, 0, 0)
+VAR child = NEW Transform(2, 10, 20)
+child.set_parent(root)
+SAYF "child: {child}"
+SAYF "child.parent.id: {child.parent.id}"
+
+CLASS Query
+  VAR results = []
+  
+  TASK add(item)
+    APPEND(results, item)
+    RETURN SELF
+  
+  TASK count()
+    RETURN LEN(results)
+
+VAR q = NEW Query()
+q.add(NEW Transform(10, 1, 2)).add(NEW Transform(11, 3, 4))
+SAYF "query count: {q.count()}"
+
+CLASS Registry
+  VAR entries = {}
+  
+  TASK set(key, value)
+    entries[key] = value
+    RETURN SELF
+  
+  TASK get(key)
+    RETURN GET_KEY(entries, key, NULL)
+
+VAR reg = NEW Registry()
+reg.set("player", NEW Transform(100, 5, 5))
+SAYF "registry player: {reg.get('player')}"
+SAYF "registry size: {LEN(reg.entries)}"
+
+SAY "class test done"

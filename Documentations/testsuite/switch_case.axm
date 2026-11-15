@@ -1,0 +1,102 @@
+// switch_case.axm - Switch/Case feature test
+
+VAR op = "+"
+SWITCH op
+  CASE "+"
+    SAY "add"
+  CASE "-"
+    SAY "sub"
+  CASE "*"
+    SAY "mul"
+  CASE "/"
+    SAY "div"
+  DEFAULT
+    SAY "unknown op"
+
+VAR event = "collision"
+SWITCH event
+  CASE "collision"
+    SAY "handle collision"
+  CASE "trigger"
+    SAY "handle trigger"
+  DEFAULT
+    SAY "ignore event"
+
+VAR hp = 45
+SWITCH TRUE
+  CASE hp > 80
+    SAY "state: healthy"
+  CASE hp > 30
+    SAY "state: wounded"
+  CASE hp > 0
+    SAY "state: critical"
+  DEFAULT
+    SAY "state: dead"
+
+VAR mode = "none"
+SWITCH mode
+  CASE "idle"
+    SAY "idle"
+  CASE "active"
+    SAY "active"
+
+SAY "after switch (no match, no default)"
+
+VAR layer = 2
+VAR depth = 3
+SWITCH layer
+  CASE 1
+    SWITCH depth
+      CASE 1
+        SAY "layer 1, depth 1"
+      DEFAULT
+        SAY "layer 1, other depth"
+  CASE 2
+    SWITCH depth
+      CASE 3
+        SAY "layer 2, depth 3"
+      DEFAULT
+        SAY "layer 2, other depth"
+  DEFAULT
+    SAY "other layer"
+
+VAR target = NULL
+SWITCH target
+  CASE NULL
+    SAY "target not set"
+  CASE 1
+    SAY "target is 1"
+  DEFAULT
+    SAY "target is other"
+
+VAR tags = ["solid", "trigger", "ladder", "unknown"]
+FOR tag IN tags
+  SWITCH tag
+    CASE "solid"
+      SAYF "{tag}: collide"
+    CASE "trigger"
+      SAYF "{tag}: fire event"
+    CASE "ladder"
+      SAYF "{tag}: climbable"
+    DEFAULT
+      SAYF "{tag}: no handler"
+
+CLASS Handler
+  TASK on_event(name)
+    SWITCH name
+      CASE "spawn"
+        RETURN "entity spawned"
+      CASE "destroy"
+        RETURN "entity destroyed"
+      CASE "damage"
+        RETURN "entity damaged"
+      DEFAULT
+        RETURN "unhandled"
+
+VAR h = NEW Handler()
+SAYF "spawn: {h.on_event('spawn')}"
+SAYF "destroy: {h.on_event('destroy')}"
+SAYF "damage: {h.on_event('damage')}"
+SAYF "unknown: {h.on_event('unknown')}"
+
+SAY "switch test done"
