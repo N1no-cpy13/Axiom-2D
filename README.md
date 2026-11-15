@@ -1,6 +1,4 @@
-Oke, ini `README.md` yang sudah dimodifikasi dengan tambahan `SWITCH/CASE/DEFAULT` dan beberapa perbaikan.
 
-```markdown
 # Axiom-2D
 # Tick-Based Game Engine
 
