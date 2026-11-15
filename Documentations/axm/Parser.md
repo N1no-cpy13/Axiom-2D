@@ -35,7 +35,9 @@ Supports:
 4. Comparison (`==`, `!=`, `>`, `<`, `>=`, `<=`)
 5. `+`, `-` (addition)
 6. `*`, `/` (multiplication)
-7. Primary (literals, variables, calls, entity refs, lists, index)
+7. `**` (power, right-associative)
+8. Unary `-`, `+`
+9. Primary (literals, variables, calls, entity refs, lists, index)
 
 ## Special Cases
 

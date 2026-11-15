@@ -339,7 +339,7 @@ Edit `GAME_CONFIG.json`:
 - **Dynamic attribute access**: `instance[key]` for get/set
 - **`to_string()`** automatically called on `SAY instance`
 - **Instance as dict key**
-- **`NEW` multi-line arguments**
+- **Power operator (`**`)**: right-associative, unary minus precedence
 
 ---
 

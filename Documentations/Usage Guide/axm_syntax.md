@@ -139,7 +139,7 @@ Quick reference for AXM language syntax.
 
 | Arithmetic | Comparison | Logical |
 |------------|------------|---------|
-| `+` `-` `*` `/` | `==` `!=` `>` `<` `>=` `<=` | `AND` `OR` `NOT` |
+| `+` `-` `*` `/` `**` | `==` `!=` `>` `<` `>=` `<=` | `AND` `OR` `NOT` |
 
 ---
 
