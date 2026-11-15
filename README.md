@@ -146,26 +146,16 @@ SAYF "1 + 2 = {utils.Add(1, 2)}"
 **Dict** — key-value storage:
 
 ```axm
-VAR player = {"name": "Bro", "health": 100, "level": 5}
-
-SAYF "{player.name}"           // Bro
-SAYF "{player['health']}"      // 100
-player.health = 90
-player['gold'] = 50
-
-// Nested
-VAR config = {"player": {"name": "Bro"}}
-SAYF "{config.player.name}"    // Bro
-
-// Dict functions
-HAS_KEY(player, "gold")        // TRUE
-GET_KEY(player, "exp", 0)      // 0
-SET_KEY(player, "atk", 15)
-DELETE_KEY(player, "level")
-KEYS(player)                   // ['name', 'health', 'gold', 'atk']
-VALUES(player)                 // ['Bro', 90, 50, 15]
-MERGE(dict1, dict2)
-CLEAR(dict)
+VAR d1 = {"a": 1}
+VAR d2 = {"b": 2}
+SAY HAS_KEY(d1, "a")               // TRUE
+SAY GET_KEY(d1, "z", 0)            // 0
+SAY SET_KEY(d1, "c", 3)
+SAY DELETE_KEY(d1, "a")
+SAY KEYS(d1)                       // ['c']
+SAY VALUES(d1)                     // [3]
+VAR merged = MERGE(d1, d2)
+SAY CLEAR(d1)
 ```
 
 ---
