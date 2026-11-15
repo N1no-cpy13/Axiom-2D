@@ -119,7 +119,7 @@ class Parser:
     
     def parse_multiplication(self):
         left = self.parse_unary()
-        while self.cur().type == "OP" and self.cur().value in ("*", "/"):
+        while self.cur().type == "OP" and self.cur().value in ("*", "/", "%"):
             op = self.cur().value 
             self.eat("OP")
             right = self.parse_unary()

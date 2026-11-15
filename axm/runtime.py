@@ -401,6 +401,10 @@ class Runtime:
                 return left * right 
             elif op == "**":
                 return left ** right
+            elif op == "%":
+                if right == 0:
+                    raise AXMRuntimeError("Modulo by zero")
+                return left % right
             elif op == "/":
                 if right == 0:
                     raise AXMRuntimeError("Division by zero")

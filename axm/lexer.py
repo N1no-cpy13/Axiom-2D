@@ -188,6 +188,10 @@ def lex(code: str):
                 tokens.append(Token("COMPOUND_OP", "/=", line_no))
                 pos += 2
                 continue
+            if line.startswith("%=", pos):
+                tokens.append(Token("COMPOUND_OP", "%=", line_no))
+                pos += 2
+                continue
             if line.startswith("==", pos):
                 tokens.append(Token("OP", "==", line_no))
                 pos += 2
@@ -209,7 +213,7 @@ def lex(code: str):
                 pos += 2
                 continue
             
-            if ch in "+-*/<>=":
+            if ch in "+-*/%<>=":
                 if ch == '=':
                     tokens.append(Token("ASSIGN", "=", line_no))
                 else:
