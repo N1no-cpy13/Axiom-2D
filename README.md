@@ -340,13 +340,12 @@ Edit `GAME_CONFIG.json`:
 - **`to_string()`** automatically called on `SAY instance`
 - **Instance as dict key**
 - **Power operator (`**`)**: right-associative, unary minus precedence
+- **`%`** (modulo) and **`%=`** (compound modulo)
 
 ---
 
 ### 🐛 Bug Fixes
 
-- **`CLASS`**: fix `SUPER()` resolution (owner class, not instance class)
-- **Module**: fix class registration in `.axc` modules
 - **`LEN`**: support `dict`
 - **Lexer**: bracket for parentheses (multi-line function/new args)
 
